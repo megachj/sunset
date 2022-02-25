@@ -11,7 +11,7 @@ allprojects {
         mavenCentral()
     }
 
-    group = "com.sunset"
+    group = "sunset"
 
     ext {
         set("springAutoRestDocsVersion", "2.0.7")

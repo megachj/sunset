@@ -1,4 +1,4 @@
-rootProject.name = "riemann"
+rootProject.name = "java-spring"
 
 include(":java")
 include(":java:file-io")
