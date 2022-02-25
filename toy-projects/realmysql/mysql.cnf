@@ -1,0 +1,66 @@
+# For advice on how to change settings please see
+# http://dev.mysql.com/doc/refman/5.7/en/server-configuration-defaults.html
+
+[client]
+default-character-set = utf8mb4
+
+[mysql]
+default-character-set = utf8mb4
+
+[mysqldump]
+default-character-set = utf8mb4
+
+[mysqld]
+#
+# Remove leading # and set to the amount of RAM for the most important data
+# cache in MySQL. Start at 70% of total RAM for dedicated server, else 10%.
+# innodb_buffer_pool_size = 128M
+#
+# Remove leading # to turn on a very important data integrity option: logging
+# changes to the binary log between backups.
+# log_bin
+#
+# Remove leading # to set options mainly useful for reporting servers.
+# The server defaults are faster for transactions and fast SELECTs.
+# Adjust sizes as needed, experiment to find the optimal values.
+# join_buffer_size = 128M
+# sort_buffer_size = 2M
+# read_rnd_buffer_size = 2M
+skip-host-cache
+skip-name-resolve
+#datadir=/var/lib/mysql
+#socket=/var/lib/mysql/mysql.sock
+#secure-file-priv=/var/lib/mysql-files
+user=mysql
+
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+
+skip-character-set-client-handshake # 클라이언트 인코딩 설정을 무시하고 데이터베이스 인코딩을 쓴다
+#init_connect="SET collation_connection = utf8mb4_unicode_ci" # 데이터베이스에 connect 할 경우 실행되는 스크립트
+#init_connect="SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"
+
+# Disabling symbolic-links is recommended to prevent assorted security risks
+symbolic-links=0
+
+#log-error=/var/log/mysqld.log
+#pid-file=/var/run/mysqld/mysqld.pid
+
+# ----------------------------------------------
+# Enable the binlog for replication & CDC
+# ----------------------------------------------
+
+# Enable binary replication log and set the prefix, expiration, and log format.
+# The prefix is arbitrary, expiration can be short for integration tests but would
+# be longer on a production system. Row-level info is required for ingest to work.
+# Server ID is required, but this will vary on production systems
+server-id         = 111111
+
+log-bin           = ON
+binlog_format     = ROW
+binlog_row_image  = FULL
+expire_logs_days  = 3
+binlog_rows_query_log_events = ON
+
+gtid_mode         = ON
+enforce_gtid_consistency = ON
