@@ -1,0 +1,16 @@
+<ehcache:config xmlns:ehcache="http://www.ehcache.org/v3" xmlns:jcache="http://www.ehcache.org/v3/jsr107">
+
+    <!-- A <cache-template> defines a named template that can be used be <cache> definitions in this same file
+        They have all the same property as the <cache> elements above -->
+    <ehcache:cache-template name="defaultTemplate">
+        <ehcache:expiry>
+            <ehcache:ttl unit="minutes">1</ehcache:ttl>
+        </ehcache:expiry>
+        <ehcache:heap unit="entries">1000</ehcache:heap>
+    </ehcache:cache-template>
+
+    <!-- A <cache> that uses the template above by referencing the cache-template's name in the uses-template attribute: -->
+    <ehcache:cache alias="member" uses-template="defaultTemplate" />
+    <ehcache:cache alias="newMember" uses-template="defaultTemplate" />
+
+</ehcache:config>
