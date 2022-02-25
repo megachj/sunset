@@ -1,0 +1,60 @@
+version: '3.9'
+services:
+  connect1:
+    build:
+      context: kafka_connect
+    networks:
+      - debezium-docker-net
+    ports:
+      - '8083:8083' # HTTP REST PORT
+    environment:
+      - KAFKA_OPTS=-javaagent:/kafka/jmx_prometheus_javaagent.jar=8080:/kafka/metrics-config.yml -Dsun.net.inetaddr.ttl=0
+      - TZ=Asia/Seoul
+      - JMX_PORT=1976
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - GROUP_ID=connect-cluster-A
+      - CONFIG_STORAGE_TOPIC=connect.configs
+      - OFFSET_STORAGE_TOPIC=connect.offsets
+      - STATUS_STORAGE_TOPIC=connect.statuses
+      - OFFSET_FLUSH_TIMEOUT_MS=60000
+
+  connect2:
+    build:
+      context: kafka_connect
+    networks:
+      - debezium-docker-net
+    ports:
+      - '8084:8083' # HTTP REST PORT
+    environment:
+      - KAFKA_OPTS=-javaagent:/kafka/jmx_prometheus_javaagent.jar=8080:/kafka/metrics-config.yml -Dsun.net.inetaddr.ttl=0
+      - TZ=Asia/Seoul
+      - JMX_PORT=1977
+      - BOOTSTRAP_SERVERS=kafka:9092
+      - GROUP_ID=connect-cluster-A
+      - CONFIG_STORAGE_TOPIC=connect.configs
+      - OFFSET_STORAGE_TOPIC=connect.offsets
+      - STATUS_STORAGE_TOPIC=connect.statuses
+      - OFFSET_FLUSH_TIMEOUT_MS=60000
+
+  prometheus:
+    build:
+      context: prometheus
+    networks:
+      - debezium-docker-net
+    ports:
+      - '9090:9090'
+
+  grafana:
+    build:
+      context: grafana
+    networks:
+      - debezium-docker-net
+    ports:
+      - '3000:3000'
+    environment: 
+      - DS_PROMETHEUS=prometheus
+
+networks: 
+  debezium-docker-net:
+    external:
+      name: debezium-docker-net

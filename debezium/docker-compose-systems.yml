@@ -1,0 +1,56 @@
+version: '3.9'
+services:
+  zookeeper:
+    image: debezium/zookeeper:1.5
+    networks:
+      - debezium-docker-net
+    ports:
+      - '2181:2181'
+      - '2888:2888'
+      - '3888:3888'
+    environment: 
+      - TZ=Asia/Seoul
+
+  kafka:
+    build:
+      context: kafka
+    networks:
+      - debezium-docker-net
+    ports:
+      - '9092:9092'
+    # volumes:
+    #   - './volumes/container_data/kafka:/kafka/data'
+    depends_on:
+      - zookeeper
+    environment:
+      - TZ=Asia/Seoul
+      - ZOOKEEPER_CONNECT=zookeeper:2181/kafka
+
+  akhq:
+    image: tchiotludo/akhq:0.17.0
+    ports:
+      - '8080:8080'
+    volumes:
+      - './volumes/akhq/application.yml:/app/application.yml'
+    networks:
+      - debezium-docker-net
+
+  mysql:
+    build:
+      context: mysql_example
+    networks:
+      - debezium-docker-net
+    ports:
+      - '3306:3306'
+    volumes:
+      - './volumes/container_data/mysql:/var/lib/mysql'
+    environment:
+      - TZ=Asia/Seoul
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=debezium
+      - MYSQL_PASSWORD=debeziumpw
+
+networks: 
+  debezium-docker-net:
+    external:
+      name: debezium-docker-net
