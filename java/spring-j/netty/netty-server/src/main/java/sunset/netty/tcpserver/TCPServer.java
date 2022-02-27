@@ -15,13 +15,13 @@ import java.net.InetSocketAddress;
 @Component
 public class TCPServer {
 
-    private final ServerBootstrap serverBootstrap;
+    private final ServerBootstrap tcpServerBootstrap;
     private final InetSocketAddress tcpPort;
     private Channel serverChannel;
 
     public void start() {
         try {
-            ChannelFuture serverChannelFuture = serverBootstrap.bind(tcpPort).sync();
+            ChannelFuture serverChannelFuture = tcpServerBootstrap.bind(tcpPort).sync();
             log.info("TCPServer is started : port {}", tcpPort.getPort());
             serverChannel = serverChannelFuture.channel().closeFuture().sync().channel();
         } catch (InterruptedException e) {

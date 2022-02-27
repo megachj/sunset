@@ -1,4 +1,4 @@
-package sunset.netty.config;
+package sunset.netty.tcpserver;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelOption;
@@ -10,14 +10,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import sunset.netty.tcpserver.SimpleChatChannelInitializer;
+import sunset.netty.config.NettyProperties;
 
 import java.net.InetSocketAddress;
 
 @RequiredArgsConstructor
 @Configuration
 @EnableConfigurationProperties(NettyProperties.class)
-public class NettyConfiguration {
+public class TCPServerNettyConfiguration {
 
     private final NettyProperties nettyProperties;
 
