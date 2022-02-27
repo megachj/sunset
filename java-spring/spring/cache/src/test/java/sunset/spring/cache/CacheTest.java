@@ -1,16 +1,13 @@
 package sunset.spring.cache;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 @Slf4j
 @SpringBootTest(classes = {MemberService.class, MemberRepository.class})
-@RunWith(SpringRunner.class)
 public class CacheTest {
 
     @Autowired
@@ -18,7 +15,7 @@ public class CacheTest {
 
     private Member smeb;
 
-    @Before
+    @BeforeEach
     public void init() {
         smeb = new Member("smeb", 27);
     }

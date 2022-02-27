@@ -1,20 +1,13 @@
 package sunset.spring.resilence4j.springboot2.client;
 
-import sunset.spring.resilence4j.springboot2.Resilience4jTestApplication;
-import sunset.spring.resilience4j.springboot2.internal.circuitbreaker.CircuitBreakerUtils;
-import sunset.spring.resilience4j.springboot2.internal.circuitbreaker.MyCircuitBreakerConfig;
-import sunset.spring.resilience4j.springboot2.internal.client.RemoteClient;
-import sunset.spring.resilience4j.springboot2.internal.client.RemoteClientBreakable;
-import sunset.spring.resilience4j.springboot2.internal.exception.IgnoredException;
-import sunset.spring.resilience4j.springboot2.internal.exception.RecordedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -22,15 +15,22 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.HttpServerErrorException;
+import sunset.spring.resilence4j.springboot2.Resilience4jTestApplication;
+import sunset.spring.resilience4j.springboot2.internal.circuitbreaker.CircuitBreakerUtils;
+import sunset.spring.resilience4j.springboot2.internal.circuitbreaker.MyCircuitBreakerConfig;
+import sunset.spring.resilience4j.springboot2.internal.client.RemoteClient;
+import sunset.spring.resilience4j.springboot2.internal.client.RemoteClientBreakable;
+import sunset.spring.resilience4j.springboot2.internal.exception.IgnoredException;
+import sunset.spring.resilience4j.springboot2.internal.exception.RecordedException;
 
 import java.time.Duration;
 
 import static org.mockito.Mockito.when;
 
 @Slf4j
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = {Resilience4jTestApplication.class})
 @Import(RemoteClientCircuitBreakerTest.TestCircuitBreakerConfig.class)
 public class RemoteClientCircuitBreakerTest {
@@ -65,7 +65,7 @@ public class RemoteClientCircuitBreakerTest {
     private CircuitBreaker circuitBreaker;
     private CircuitBreaker.Metrics metrics;
 
-    @Before
+    @BeforeEach
     public void initStubbing() {
         circuitBreaker = circuitBreakerRegistry.circuitBreaker(MyCircuitBreakerConfig.CIRCUIT_BREAKER_NAME);
         circuitBreaker.reset(); // 여러 테스트 시에 서킷 브레이커 상태, 데이터 초기화

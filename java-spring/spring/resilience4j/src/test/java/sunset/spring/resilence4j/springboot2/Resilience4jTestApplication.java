@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @Slf4j
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.sunset.spring.*"})
+@ComponentScan(basePackages = {"sunset.spring.*"})
 public class Resilience4jTestApplication {
     public static void main(String[] args) {
         SpringApplication.run(Resilience4jTestApplication.class, args);
