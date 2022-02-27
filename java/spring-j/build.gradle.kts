@@ -27,7 +27,7 @@ allprojects {
 val nonLeafNodeProject = listOf(rootProject, subprojects.filter { it.subprojects.isNotEmpty() })
 configure(nonLeafNodeProject) {
     tasks.bootJar { enabled = false }
-    tasks.jar { enabled = true }
+    tasks.jar { enabled = false }
 }
 
 val leafNodeProject = subprojects.filter { it.subprojects.isEmpty() }
