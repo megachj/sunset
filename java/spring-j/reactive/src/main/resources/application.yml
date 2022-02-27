@@ -1,0 +1,8 @@
+server:
+  port: ${running.port:8080}
+
+logging:
+  level:
+    root: info
+  file:
+    path: ${application.log.dir:./logs}
