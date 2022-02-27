@@ -1,0 +1,23 @@
+spring:
+  application.name: netty-server
+
+sunset:
+  netty:
+    tcp-server:
+      port: 9010
+      boss-count: 1
+      worker-count: 3
+      keep-alive: true
+      backlog: 100
+    websocket-server:
+      port: 10010
+      boss-count: 1
+      worker-count: 3
+      keep-alive: true
+      backlog: 100
+    http-server:
+      port: 11010
+      boss-count: 1
+      worker-count: 3
+      keep-alive: true
+      backlog: 100
