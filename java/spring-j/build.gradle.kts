@@ -1,7 +1,7 @@
 plugins {
     java
     `java-library`
-    id("org.springframework.boot") version "2.4.5"
+    id("org.springframework.boot") version "2.6.4"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
 }
 
@@ -19,16 +19,19 @@ allprojects {
 
         set("hibernateValidatorVersion", "7.0.0.Final")
         set("resilience4jVersion", "1.6.1")
+
+        set("nettyVersion", "4.1.74.Final")
     }
 }
 
-val jarProject = listOf(rootProject)
-configure(jarProject) {
+val nonLeafNodeProject = listOf(rootProject, subprojects.filter { it.subprojects.isNotEmpty() })
+configure(nonLeafNodeProject) {
     tasks.bootJar { enabled = false }
     tasks.jar { enabled = true }
 }
 
-subprojects {
+val leafNodeProject = subprojects.filter { it.subprojects.isEmpty() }
+configure(leafNodeProject) {
     apply(plugin = "java")
     apply(plugin = "java-library") // dependency api 사용
     apply(plugin = "org.springframework.boot")
