@@ -27,9 +27,8 @@ const c1 = 1
 // c1 = 2; // 변경 불가능, TypeError: Assignment to constant variable.
 console.log("c1", c1);
 
+
 /**
- * 객체와 타입
- * 
  * 자바스크립트의 값은 원시 타입과 객체(참조형)으로 나뉜다.
  * 
  * 원시 타입: 하나의 값만 가지며, 불변 데이터라서 연산을 해도 기존 값이 변경되지 않는다.
@@ -85,10 +84,13 @@ const user = {
 user[Symbol('id')] = 'firstId';
 console.log("심볼의 활용 예제: ", user, user[Symbol('id')]); // Symbol('id') 프로퍼티에 거의 접근할 수 없다.(이터레이터, 기타 메서드로 접근할 수 있음) -> 프로퍼티 변경이 안됨.
 
-// ------------------------------------------------------------
-// 자바스크립트에서 원시 타입이 아닌 모든 값은 객체이다. 객체는 '이름(키):값' 형태로 컨테이너이며, 컨테이너 내부 값은 변경 가능이다.
-// 이름(키)에는 숫자, 문자열, 심볼만 가능하고, 값은 어떤 표현식이든 올 수 있다.
 
+/**
+ * 자바스크립트에서 원시 타입이 아닌 모든 값은 객체이다. 객체는 '이름(키):값' 형태로 컨테이너이며, 컨테이너 내부 값은 변경 가능이다.
+ * 이름(키)에는 숫자, 문자열, 심볼만 가능하고, 값은 어떤 표현식이든 올 수 있다.
+ */
+
+// ------------------------------------------------------------
 // Object 로 객체 생성: 거의 사용 안함.
 const obj = new Object();
 // 프로퍼티 생성
@@ -142,3 +144,66 @@ const userInfo = {
 console.log(userInfo.fullName);
 userInfo.fullName = "이 병건";
 console.log(userInfo.fullName);
+
+
+/**
+ * 자바스크립트의 배열은 객체의 특별한 형태로, '순서(인덱스)가 있는 데이터 집합'이다.
+ * 그래서 배열은 객체이지만 정수 타입인 '인덱스를 프로퍼티로 갖는' 특별한 데이터이다.
+ */
+
+// ------------------------------------------------------------
+// Array() 생성자 사용
+const arr = new Array(1, '2', true); // [1, '2', true]
+const arr1 = new Array(3); // 인자가 정수 1개일땐 해당 길이의 빈 리스트 생성, [empty, empty, empty]
+
+// 배열 리터럴: [] 사용
+const arr2 = [1, '2', true];
+
+// 원소 접근과 동적인 원소 생성
+const arr3 = ['f', 'o', 'o'];
+console.log(arr3[0], arr3[1], arr3[2], arr3[3]); // f o o undefined
+
+// 희소 배열: 연속적이지 않고 중간에 빈 값이 있는 배열 -> 왠만하면 지양하자.
+const arr4 = [] 
+arr4[0] = 0;
+arr4[2] = 2;
+console.log(arr4, arr4.length); // [0, empty, 2] 길이는 마지막 인덱스보다 항상 1큼
+
+// 유사 배열 객체: length 프로퍼티로 양의 정수 값을 가진 객체여야 한다.
+const arr5 = {
+  0: 'Hi',
+  1: 'My',
+  2: 'name is',
+  3: 'javascript',
+  length: 4,
+};
+
+// 유사 배열 객체의 대표적인 예) arguments 객체는 함수에 전달한 인자를 유사 배열 객체로 만든 데이터이다.
+function foo(a, b, c) {
+  console.log(arguments[0], arguments[1], arguments[2]);
+  console.log(arguments.length);
+
+  // 배열이 아닌 유사 배열 객체이기 때문에 배열의 내장 메서드를 사용할 수 없다. 아래 코드는 TypeError가 발생한다.
+  // arguments.forEach((arg) => {
+  //   console.log(arg);
+  // });
+
+  // 배열의 내장 메서드를 call() 또는 apply() 함수와 결합해 사용할 수 있다.
+  Array.prototype.forEach.call(arguments, (arg) => {
+    console.log(arg);
+  });
+}
+foo('a', 'b', 'c');
+
+// ------------------------------------------------------------
+// 랩퍼 객체는 원시 타입의 객체 
+// 원시타입 -박싱-> 랩퍼 객체
+const str5 = 'javascript';
+console.log('javascript'.length); // 문자열 -> 임시 객체로 변환(박싱), 프로퍼티(length) 값 읽고 임시 객체는 메모리에서 제거
+
+const str4 = new String('javascript');
+console.log(typeof str4); // object, 랩퍼 타입은 객체이다.
+
+// 랩퍼 객체 -언박싱-> 원시타입
+const wrapperNum = new Number(11);
+console.log(wrapperNum.valueOf(), typeof wrapperNum.valueOf());
