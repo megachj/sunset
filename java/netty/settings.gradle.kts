@@ -1,4 +1,4 @@
-rootProject.name = "spring-netty"
+rootProject.name = "netty"
 
 include(":echo-server")
 include(":echo-client")
