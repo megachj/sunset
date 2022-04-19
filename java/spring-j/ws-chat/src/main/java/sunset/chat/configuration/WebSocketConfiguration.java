@@ -18,7 +18,7 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry
             .addHandler(getChatWebSocketHandler(), CHAT_ENDPOINT)
-            //.addInterceptors() // TODO: 핸드쉐이크 전에 http header 를 보고 인증 관련 로직 추가하기
+            //.addInterceptors() // TODO: 핸드쉐이크 전에 http header 를 보고 인증 관련 로직 추가하기, https://hyeooona825.tistory.com/89
             .setAllowedOrigins("*");
     }
 
