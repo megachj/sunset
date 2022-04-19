@@ -16,7 +16,9 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(getChatWebSocketHandler(), CHAT_ENDPOINT)
+        registry
+            .addHandler(getChatWebSocketHandler(), CHAT_ENDPOINT)
+            //.addInterceptors() // TODO: 핸드쉐이크 전에 http header 를 보고 인증 관련 로직 추가하기
             .setAllowedOrigins("*");
     }
 
