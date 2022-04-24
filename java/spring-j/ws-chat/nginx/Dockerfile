@@ -1,7 +1,7 @@
 FROM nginx:1.21.6
 LABEL MAINTAINER="sunset.choe"
 
-COPY config/nginx.conf /etc/nginx/conf.d/nginx.conf
+COPY conf/nginx.conf /etc/nginx/conf.d/nginx.conf
 
 CMD ["nginx", "-g", "daemon off;"]
 
