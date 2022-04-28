@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 @Slf4j
-public class T01_시퀀스생성 {
+public class T01_1_시퀀스생성 {
 
     @Test
     public void 시퀀스만들기_기본() {
