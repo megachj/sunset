@@ -21,28 +21,33 @@ public class ChatWebSocketHandler implements WebSocketHandler {
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
+        String userId = (String) session.getAttributes()
+            .get(ChatHandshakeWebSocketService.USER_HEADER_NAME);
+
         Flux<WebSocketMessage> inputStream = session.receive()
             .log("session.receive()")
             .doOnSubscribe(subscription -> {
-                log.info("Connection[{}] is established", session.getId(), subscription);
-                sessionRepository.addSession(session.getId(), session); // FIXME: userId
+                log.info("Connection[userId: {}, sessionId: {}] is established", userId, session.getId());
+                sessionRepository.addSession(userId, session);
             })
             .doOnComplete(() -> {
-                log.info("Connection[{}] is closed on complete", session.getId());
-                sessionRepository.removeSession(session.getId(), session); // FIXME: userId
+                log.info("Connection[userId: {}, sessionId: {}] is closed on complete", userId, session.getId());
+                sessionRepository.removeSession(userId, session);
             })
             .doOnError(error -> {
-                log.error("Connection[{}] is closed on error", session.getId(), error);
-                sessionRepository.removeSession(session.getId(), session); // FIXME: userId
+                log.error("Connection[userId: {}, sessionId: {}] is closed on error", userId, session.getId(),
+                    error);
+                sessionRepository.removeSession(userId, session);
             })
             .doOnCancel(() -> {
-                log.info("Connection[{}] is closed on cancel", session.getId());
-                sessionRepository.removeSession(session.getId(), session); // FIXME: userId
+                log.info("Connection[userId: {}, sessionId: {}] is closed on cancel", userId, session.getId());
+                sessionRepository.removeSession(userId, session);
             })
             .doOnNext(webSocketMessage -> {
                 String message = webSocketMessage.getPayloadAsText();
-                log.info("Received inbound message from [{}]: {}", session.getId(), message);
-                pubSubService.sendMessage(String.format("From [%s]: %s", session.getId(), message));
+                log.info("Received inbound message from [userId: {}, sessionId: {}]: {}", userId, session.getId(),
+                    message);
+                pubSubService.sendMessage(String.format("From [%s]: %s", userId, message));
             });
 
         Flux<WebSocketMessage> pubSubListenSource = pubSubService.listen()

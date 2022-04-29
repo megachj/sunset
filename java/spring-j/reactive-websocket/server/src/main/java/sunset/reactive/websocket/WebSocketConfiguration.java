@@ -8,7 +8,6 @@ import org.springframework.web.reactive.HandlerMapping;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.reactive.socket.server.WebSocketService;
-import org.springframework.web.reactive.socket.server.support.HandshakeWebSocketService;
 import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
 import org.springframework.web.reactive.socket.server.upgrade.ReactorNettyRequestUpgradeStrategy;
 
@@ -26,11 +25,11 @@ public class WebSocketConfiguration {
 
     @Bean
     public HandlerAdapter handlerAdapter() {
-        return new WebSocketHandlerAdapter(webSocketService());
+        return new WebSocketHandlerAdapter(chatHandshakeWebSocketService());
     }
 
     @Bean
-    public WebSocketService webSocketService() {
-        return new HandshakeWebSocketService(new ReactorNettyRequestUpgradeStrategy());
+    public WebSocketService chatHandshakeWebSocketService() {
+        return new ChatHandshakeWebSocketService(new ReactorNettyRequestUpgradeStrategy());
     }
 }
