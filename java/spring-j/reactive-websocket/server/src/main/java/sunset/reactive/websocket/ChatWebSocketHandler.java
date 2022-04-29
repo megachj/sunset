@@ -57,7 +57,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
             .doOnNext(webSocketMessage -> {
                 ChatMessage chatMessage = ChatMessage.parsePayload(userId, webSocketMessage.getPayloadAsText());
 
-                log.info("Received inbound message from[sessionId: {}]: {}", session.getId(), chatMessage);
+                log.info("From[sessionId: {}]: {}", session.getId(), chatMessage);
                 simpleChatMessagePubSubService.sendMessage(chatMessage);
             });
 
