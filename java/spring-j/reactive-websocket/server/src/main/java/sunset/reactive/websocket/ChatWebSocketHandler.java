@@ -10,16 +10,20 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
+import sunset.reactive.websocket.model.ChatMessage;
+import sunset.reactive.websocket.pubsub.PubSubService;
 import sunset.reactive.websocket.repository.SessionRepository;
-import sunset.reactive.websocket.service.PubSubService;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class ChatWebSocketHandler implements WebSocketHandler {
 
+    private static final Duration PING_INTERVAL = Duration.ofSeconds(1);
+    private static final byte[] PING_PAYLOAD = new byte[0];
+
     private final SessionRepository sessionRepository;
-    private final PubSubService pubSubService;
+    private final PubSubService<ChatMessage> simpleChatMessagePubSubService;
     private final Scheduler wsConnTimer;
 
     @Override
@@ -51,13 +55,17 @@ public class ChatWebSocketHandler implements WebSocketHandler {
                 sessionRepository.removeSession(userId, session);
             })
             .doOnNext(webSocketMessage -> {
-                String message = webSocketMessage.getPayloadAsText();
-                log.info("Received inbound message from [userId: {}, sessionId: {}]: {}", userId, session.getId(),
-                    message);
-                pubSubService.sendMessage(String.format("From [%s]: %s", userId, message));
+                ChatMessage chatMessage = ChatMessage.parsePayload(userId, webSocketMessage.getPayloadAsText());
+
+                log.info("Received inbound message from[sessionId: {}]: {}", session.getId(), chatMessage);
+                simpleChatMessagePubSubService.sendMessage(chatMessage);
             });
 
-        Flux<WebSocketMessage> pubSubListenSource = pubSubService.listen()
+        Flux<WebSocketMessage> pubSubListenSource = simpleChatMessagePubSubService.listen(userId)
+            .map(chatMessage -> String.format("from %s: %s",
+                chatMessage.getFromUserId(),
+                chatMessage.getContent())
+            )
             .map(session::textMessage);
 
         Mono<Void> input = inputStream.then();
