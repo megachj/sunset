@@ -1,4 +1,4 @@
-package sunset.spring.webflux.test;
+package sunset.spring.webflux;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

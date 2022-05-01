@@ -1,4 +1,4 @@
-package sunset.spring.webflux.test;
+package sunset.spring.webflux;
 
 import java.util.ArrayList;
 import java.util.List;
