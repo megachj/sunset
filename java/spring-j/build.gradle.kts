@@ -3,6 +3,7 @@ plugins {
     `java-library`
     id("org.springframework.boot") version "2.6.4"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    id("com.palantir.docker") version "0.32.0"
 }
 
 allprojects {
