@@ -1,11 +1,11 @@
 apply plugin: "com.palantir.docker"
 
-def tagname = "latest"
+def tagname = BUILD_TIME
 if (System.getenv("DOCKER_TAG")) {
     tagname = System.getenv("DOCKER_TAG")
 }
 
-def imagename = project.name
+def imagename = project.getParent().name + "_" + project.name
 if (System.getenv("DOCKER_IMG_NAME")) {
     imagename = System.getenv("DOCKER_IMG_NAME")
 }

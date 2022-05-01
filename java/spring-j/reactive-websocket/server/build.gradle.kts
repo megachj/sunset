@@ -1,4 +1,4 @@
-apply(from = "../../docker-build.gradle")
+apply(from = "./docker-custom-build.gradle")
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")

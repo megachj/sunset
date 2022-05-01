@@ -1,4 +1,3 @@
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -19,6 +18,7 @@ allprojects {
     group = "sunset"
 
     ext {
+        set("BUILD_TIME", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm_ss")))
         set("springAutoRestDocsVersion", "2.0.7")
         set("springDocOpenApiUiVersion", "1.5.2") // Swagger
 
