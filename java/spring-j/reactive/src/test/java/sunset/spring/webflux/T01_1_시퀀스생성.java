@@ -1,5 +1,6 @@
 package sunset.spring.webflux;
 
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.StringUtils;
@@ -8,9 +9,13 @@ import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.Optional;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 @Slf4j
 public class T01_1_시퀀스생성 {
+
+    private Scheduler scheduler = Schedulers.newParallel("asyncJob");
 
     @Test
     public void 시퀀스만들기_기본() {
@@ -53,6 +58,22 @@ public class T01_1_시퀀스생성 {
         // 이 라인이 실행될때 세션 검사
         Mono<String> userInfo1 = isValidSession(sessionId)
                 ? Mono.just("유저정보") : Mono.error(new RuntimeException("Invalid user session"));
+    }
+
+    @Test
+    public void test() throws Exception {
+        log.info("main start");
+        Mono
+            .delay(Duration.ofSeconds(3), scheduler)
+            .log()
+            .doOnNext(next -> {
+                log.info("send 1 message async");
+                return;
+            })
+            .subscribe();
+
+        Thread.sleep(5 * 1000);
+        log.info("main end");
     }
 
     private boolean isValidSession(String sessionId) {

@@ -1,4 +1,4 @@
-package sunset.reactive.websocket.pubsub;
+package sunset.reactive.websocketserver.pubsub;
 
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -8,9 +8,9 @@ import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.FluxSink.OverflowStrategy;
-import sunset.reactive.websocket.channel.Channel;
-import sunset.reactive.websocket.channel.ChannelListener;
-import sunset.reactive.websocket.model.ChatMessage;
+import sunset.reactive.websocketserver.channel.Channel;
+import sunset.reactive.websocketserver.channel.ChannelListener;
+import sunset.reactive.websocketserver.model.ChatMessage;
 
 @Slf4j
 @RequiredArgsConstructor

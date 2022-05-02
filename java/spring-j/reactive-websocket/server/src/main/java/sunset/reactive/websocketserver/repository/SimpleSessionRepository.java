@@ -1,4 +1,4 @@
-package sunset.reactive.websocket.repository;
+package sunset.reactive.websocketserver.repository;
 
 import java.util.Collection;
 import java.util.HashMap;

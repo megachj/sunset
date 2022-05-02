@@ -1,4 +1,4 @@
-package sunset.reactive.websocket.model;
+package sunset.reactive.websocketserver.model;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package sunset.reactive.websocket.channel;
+package sunset.reactive.websocketserver.channel;
 
 import java.util.ArrayList;
 import java.util.List;

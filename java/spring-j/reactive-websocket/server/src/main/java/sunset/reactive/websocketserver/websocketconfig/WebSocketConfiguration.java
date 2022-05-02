@@ -1,4 +1,4 @@
-package sunset.reactive.websocket;
+package sunset.reactive.websocketserver.websocketconfig;
 
 import java.util.Collections;
 import org.springframework.context.annotation.Bean;

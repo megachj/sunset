@@ -1,4 +1,4 @@
-package sunset.reactive.websocket.channel;
+package sunset.reactive.websocketserver.channel;
 
 public interface ChannelListener<T> {
 

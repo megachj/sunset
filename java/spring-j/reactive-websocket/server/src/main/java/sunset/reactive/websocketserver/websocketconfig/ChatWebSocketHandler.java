@@ -1,4 +1,4 @@
-package sunset.reactive.websocket;
+package sunset.reactive.websocketserver.websocketconfig;
 
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
@@ -10,9 +10,11 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
-import sunset.reactive.websocket.model.ChatMessage;
-import sunset.reactive.websocket.pubsub.PubSubService;
-import sunset.reactive.websocket.repository.SessionRepository;
+import sunset.reactive.externalrestserver.UserNicknameInfo;
+import sunset.reactive.websocketserver.model.ChatMessage;
+import sunset.reactive.websocketserver.pubsub.PubSubService;
+import sunset.reactive.websocketserver.repository.SessionRepository;
+import sunset.reactive.websocketserver.webclient.ExternalWebClient;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,7 +25,12 @@ public class ChatWebSocketHandler implements WebSocketHandler {
     private static final byte[] PING_PAYLOAD = new byte[0];
 
     private final SessionRepository sessionRepository;
+
     private final PubSubService<ChatMessage> simpleChatMessagePubSubService;
+    private final PubSubService<UserNicknameInfo> asyncUserNicknamePubSubService;
+
+    private final ExternalWebClient externalWebClient;
+
     private final Scheduler wsConnTimer;
 
     @Override
@@ -59,17 +66,25 @@ public class ChatWebSocketHandler implements WebSocketHandler {
 
                 log.info("From[sessionId: {}]: {}", session.getId(), chatMessage);
                 simpleChatMessagePubSubService.sendMessage(chatMessage);
+                externalWebClient.getAsyncUserNickName(userId)
+                    .subscribe();
             });
 
-        Flux<WebSocketMessage> pubSubListenSource = simpleChatMessagePubSubService.listen(userId)
+        Flux<WebSocketMessage> chatMessageSource = simpleChatMessagePubSubService.listen(userId)
             .map(chatMessage -> String.format("from %s: %s",
                 chatMessage.getFromUserId(),
                 chatMessage.getContent())
             )
             .map(session::textMessage);
 
+        Flux<WebSocketMessage> asyncUserNicknameSource = asyncUserNicknamePubSubService.listen(userId)
+            .map(userNicknameInfo -> String.format("UserNicknameInfo: %s", userNicknameInfo))
+            .map(session::textMessage);
+
         Mono<Void> input = inputStream.then();
-        Mono<Void> output = session.send(pubSubListenSource);
+        Mono<Void> output = session.send(
+            Flux.merge(chatMessageSource, asyncUserNicknameSource)
+        );
 
         return Mono.zip(input, output).then();
     }
