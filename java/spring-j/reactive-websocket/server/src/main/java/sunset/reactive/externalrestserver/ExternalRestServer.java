@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
-import sunset.reactive.websocketserver.pubsub.AsyncUserNicknamePubSubService;
+import sunset.reactive.websocketserver.pubsub.UserNicknamePubSubService;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 public class ExternalRestServer {
 
-    private final AsyncUserNicknamePubSubService asyncUserNicknamePubSubService;
+    private final UserNicknamePubSubService asyncUserNicknamePubSubService;
     private final Scheduler asyncJobScheduler;
 
     @GetMapping("/api/users/{userId}/nickname/sync")

@@ -40,7 +40,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
         long connectionLiveSeconds = (Long) session.getAttributes()
             .get(ChatHandshakeWebSocketService.CONNECTION_LIVE_SECONDS_ATTRIBUTE_NAME);
 
-        Flux<WebSocketMessage> inputStream = session.receive()
+        Mono<Void> input = session.receive()
             //.log("session.receive()")
             .take(Duration.ofSeconds(connectionLiveSeconds), wsConnTimer)
             .doOnSubscribe(subscription -> {
@@ -66,9 +66,13 @@ public class ChatWebSocketHandler implements WebSocketHandler {
 
                 log.info("From[sessionId: {}]: {}", session.getId(), chatMessage);
                 simpleChatMessagePubSubService.sendMessage(chatMessage);
+                externalWebClient.getSyncUserNickName(userId)
+                    .doOnNext(next -> asyncUserNicknamePubSubService.sendMessage(next))
+                    .subscribe();
                 externalWebClient.getAsyncUserNickName(userId)
                     .subscribe();
-            });
+            })
+            .then();
 
         Flux<WebSocketMessage> chatMessageSource = simpleChatMessagePubSubService.listen(userId)
             .map(chatMessage -> String.format("from %s: %s",
@@ -77,13 +81,12 @@ public class ChatWebSocketHandler implements WebSocketHandler {
             )
             .map(session::textMessage);
 
-        Flux<WebSocketMessage> asyncUserNicknameSource = asyncUserNicknamePubSubService.listen(userId)
+        Flux<WebSocketMessage> userNicknameSource = asyncUserNicknamePubSubService.listen(userId)
             .map(userNicknameInfo -> String.format("UserNicknameInfo: %s", userNicknameInfo))
             .map(session::textMessage);
 
-        Mono<Void> input = inputStream.then();
         Mono<Void> output = session.send(
-            Flux.merge(chatMessageSource, asyncUserNicknameSource)
+            Flux.merge(chatMessageSource, userNicknameSource)
         );
 
         return Mono.zip(input, output).then();

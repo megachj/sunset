@@ -15,7 +15,7 @@ import sunset.reactive.websocketserver.channel.ChannelListener;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class AsyncUserNicknamePubSubService implements PubSubService<UserNicknameInfo> {
+public class UserNicknamePubSubService implements PubSubService<UserNicknameInfo> {
 
     private Channel<UserNicknameInfo> channel;
     private ConnectableFlux<UserNicknameInfo> hotSource;
