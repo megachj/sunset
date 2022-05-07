@@ -28,10 +28,10 @@ public class T01_Iterable {
 
         // Data Source 에서 데이터를 한 개씩 Pull 해온다.
         for (Integer i : iter) { // for-each 문
-            log.info("for-each: {}", i);
+            log.debug("for-each: {}", i);
         }
         for (Iterator<Integer> it = iter.iterator(); it.hasNext(); it.hasNext()) { // for 문
-            log.info("for: {}", it.next());
+            log.debug("for: {}", it.next());
         }
     }
 }

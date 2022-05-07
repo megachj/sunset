@@ -27,13 +27,13 @@ public class T04_SchedulersEx {
             .log("B")
             .subscribe(
                 next -> {
-                    log.info("onNext: {}", next);
+                    log.debug("onNext: {}", next);
                 },
                 throwable -> {
-                    log.info("onError", throwable);
+                    log.debug("onError", throwable);
                 },
                 () -> {
-                    log.info("onComplete");
+                    log.debug("onComplete");
                 });
 
         log.info("Main end.");
@@ -52,13 +52,13 @@ public class T04_SchedulersEx {
             .log("B")
             .subscribe(
                 next -> {
-                    log.info("onNext: {}", next);
+                    log.debug("onNext: {}", next);
                 },
                 throwable -> {
-                    log.info("onError", throwable);
+                    log.debug("onError", throwable);
                 },
                 () -> {
-                    log.info("onComplete");
+                    log.debug("onComplete");
                 });
 
         log.info("Main end.");
@@ -74,13 +74,13 @@ public class T04_SchedulersEx {
             .log("C")
             .subscribe(
                 next -> {
-                    log.info("onNext: {}", next);
+                    log.debug("onNext: {}", next);
                 },
                 throwable -> {
-                    log.info("onError", throwable);
+                    log.debug("onError", throwable);
                 },
                 () -> {
-                    log.info("onComplete");
+                    log.debug("onComplete");
                 });
 
         log.info("Main end.");
@@ -96,13 +96,13 @@ public class T04_SchedulersEx {
             .log("C")
             .subscribe(
                 next -> {
-                    log.info("onNext: {}", next);
+                    log.debug("onNext: {}", next);
                 },
                 throwable -> {
-                    log.info("onError", throwable);
+                    log.debug("onError", throwable);
                 },
                 () -> {
-                    log.info("onComplete");
+                    log.debug("onComplete");
                 });
 
         log.info("Main end.");
@@ -116,12 +116,12 @@ public class T04_SchedulersEx {
             sub.onSubscribe(new Subscription() {
                 @Override
                 public void request(long n) {
-                    log.info("request start");
+                    log.debug("request start");
                     sub.onNext(1);
                     sub.onNext(2);
                     sub.onNext(3);
                     sub.onComplete();
-                    log.info("request end");
+                    log.debug("request end");
                 }
 
                 @Override
@@ -142,13 +142,13 @@ public class T04_SchedulersEx {
             es.execute(() -> pub.subscribe(new Subscriber<Integer>() {
                 @Override
                 public void onSubscribe(Subscription subscription) {
-                    log.info("A onSubscribe");
+                    log.debug("A onSubscribe");
                     sub.onSubscribe(subscription);
                 }
 
                 @Override
                 public void onNext(Integer integer) {
-                    log.info("A onNext: {}", integer);
+                    log.debug("A onNext: {}", integer);
                     sub.onNext(integer);
                 }
 
@@ -161,7 +161,7 @@ public class T04_SchedulersEx {
 
                 @Override
                 public void onComplete() {
-                    log.info("A onComplete");
+                    log.debug("A onComplete");
                     sub.onComplete();
                     es.shutdown();
                 }
@@ -179,14 +179,14 @@ public class T04_SchedulersEx {
 
                 @Override
                 public void onSubscribe(Subscription subscription) {
-                    log.info("B onSubscribe");
+                    log.debug("B onSubscribe");
                     sub.onSubscribe(subscription);
                 }
 
                 @Override
                 public void onNext(Integer integer) {
                     es.execute(() -> {
-                        log.info("B onNext: {}", integer);
+                        log.debug("B onNext: {}", integer);
                         sub.onNext(integer);
                     });
                 }
@@ -203,7 +203,7 @@ public class T04_SchedulersEx {
                 @Override
                 public void onComplete() {
                     es.execute(() -> {
-                        log.info("B onComplete");
+                        log.debug("B onComplete");
                         sub.onComplete();
                     });
                     es.shutdown();
@@ -214,13 +214,13 @@ public class T04_SchedulersEx {
         publishOnPub.subscribe(new Subscriber<Integer>() {
             @Override
             public void onSubscribe(Subscription subscription) {
-                log.info("C onSubscribe");
+                log.debug("C onSubscribe");
                 subscription.request(Long.MAX_VALUE);
             }
 
             @Override
             public void onNext(Integer integer) {
-                log.info("C onNext: {}", integer);
+                log.debug("C onNext: {}", integer);
             }
 
             @Override
@@ -230,7 +230,7 @@ public class T04_SchedulersEx {
 
             @Override
             public void onComplete() {
-                log.info("C onComplete");
+                log.debug("C onComplete");
             }
         });
 

@@ -141,7 +141,7 @@ class SimpleSubscriber<T> implements Subscriber<T> {
 
     @Override
     public void onSubscribe(Subscription subscription) {
-        log.info("onSubscribe");
+        log.debug("onSubscribe");
 
         this.subscription = subscription;
         this.subscription.request(Long.MAX_VALUE);
@@ -149,7 +149,7 @@ class SimpleSubscriber<T> implements Subscriber<T> {
 
     @Override
     public void onNext(T item) {
-        log.info("onNext: {}", item);
+        log.debug("onNext: {}", item);
     }
 
     @Override
@@ -159,7 +159,7 @@ class SimpleSubscriber<T> implements Subscriber<T> {
 
     @Override
     public void onComplete() {
-        log.info("onComplete");
+        log.debug("onComplete");
     }
 }
 

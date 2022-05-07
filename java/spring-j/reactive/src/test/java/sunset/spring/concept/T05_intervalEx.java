@@ -19,7 +19,7 @@ public class T05_intervalEx {
         // 내부적으로 사용되는 스레드들이 모두 데몬 스레드이다.
         Flux.interval(Duration.ofMillis(100))
             .take(10)
-            .subscribe(s -> log.info("onNext: {}", s));
+            .subscribe(s -> log.debug("onNext: {}", s));
 
         log.info("exit");
 
@@ -48,7 +48,7 @@ public class T05_intervalEx {
 
                 @Override
                 public void cancel() {
-                    log.info("cancel");
+                    log.debug("cancel");
                     cancelled = true;
                 }
             });
@@ -90,13 +90,13 @@ public class T05_intervalEx {
         takePub.subscribe(new Subscriber<Integer>() {
             @Override
             public void onSubscribe(Subscription subscription) {
-                log.info("onSubscribe");
+                log.debug("onSubscribe");
                 subscription.request(Long.MAX_VALUE);
             }
 
             @Override
             public void onNext(Integer integer) {
-                log.info("onNext: {}", integer);
+                log.debug("onNext: {}", integer);
             }
 
             @Override
@@ -106,7 +106,7 @@ public class T05_intervalEx {
 
             @Override
             public void onComplete() {
-                log.info("onComplete");
+                log.debug("onComplete");
             }
         });
     }

@@ -4,5 +4,4 @@ server:
 logging:
   level:
     root: info
-  file:
-    path: ${application.log.dir:./logs}
+    sunset.*: debug
