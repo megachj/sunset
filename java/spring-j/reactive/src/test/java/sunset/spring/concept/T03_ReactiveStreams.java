@@ -50,7 +50,7 @@ public class T03_ReactiveStreams {
                 e.complete();
             })
             .log("Step1")
-            .map(s -> s*10)
+            .map(s -> s * 10)
             .reduce(0, (a, b) -> a + b)
             .log("Step2")
             .subscribe(s -> log.info("{}", s));
