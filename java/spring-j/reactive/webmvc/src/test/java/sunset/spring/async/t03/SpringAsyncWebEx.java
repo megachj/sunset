@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @SpringBootApplication
-//@EnableWebMvc
 @EnableAsync
-public class T06_3_SpringAsyncWebEx {
+public class SpringAsyncWebEx {
 
     @RestController
     public static class MyController {
@@ -29,6 +28,6 @@ public class T06_3_SpringAsyncWebEx {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(T06_3_SpringAsyncWebEx.class, args);
+        SpringApplication.run(SpringAsyncWebEx.class, args);
     }
 }

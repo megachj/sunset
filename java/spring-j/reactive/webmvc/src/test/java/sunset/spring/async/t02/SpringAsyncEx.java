@@ -17,7 +17,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 @Slf4j
 @SpringBootApplication
 @EnableAsync
-public class T06_2_SpringAsyncEx {
+public class SpringAsyncEx {
 
     @Component
     public static class MyService {
@@ -41,7 +41,7 @@ public class T06_2_SpringAsyncEx {
     }
 
     public static void main(String[] args) {
-        try(ConfigurableApplicationContext c = SpringApplication.run(T06_2_SpringAsyncEx.class, args)) {
+        try(ConfigurableApplicationContext c = SpringApplication.run(SpringAsyncEx.class, args)) {
         }
     }
 

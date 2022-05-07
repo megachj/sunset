@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
  * 비동기 작업의 결과를 가져오는 방법 1. Future 2. Callback
  */
 @Slf4j
-public class T06_1_FutureEx {
+public class FutureEx {
 
     interface SuccessCallback {
 
