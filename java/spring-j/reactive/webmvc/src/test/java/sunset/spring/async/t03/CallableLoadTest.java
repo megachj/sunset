@@ -1,22 +1,18 @@
 package sunset.spring.async.t03;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StopWatch;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StopWatch;
-import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 public class CallableLoadTest {
     static AtomicInteger counter = new AtomicInteger(0);
 
-    /**
-     *
-     * @param args
-     * @throws InterruptedException
-     */
     public static void main(String[] args) throws InterruptedException {
         ExecutorService es = Executors.newFixedThreadPool(100);
 
