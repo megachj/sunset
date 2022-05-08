@@ -1,0 +1,30 @@
+
+---
+spring:
+  config:
+    activate:
+      on-profile: connection200
+
+server:
+  tomcat:
+    max-connections: 200
+
+---
+spring:
+  config:
+    activate:
+      on-profile: connection20
+
+server:
+  tomcat:
+    max-connections: 20
+
+---
+spring:
+  config:
+    activate:
+      on-profile: connection1
+
+server:
+  tomcat:
+    max-connections: 2
