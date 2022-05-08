@@ -43,29 +43,29 @@ public class SpringAsyncWebEx {
     public static class MyController {
 
         /**
+         * tomcat-thread-20: 10초, http-nio-8080-exec 가 20개 만들어져서 20개 req 씩 처리
+         * tomcat-thread-100: 2초, http-nio-8080-exec 가 100개 만들어져서 한번에 처리
+         */
+        @GetMapping("/sync")
+        public String sync() throws InterruptedException {
+            log.info("/sync");
+            Thread.sleep(2000);
+            return "hello";
+        }
+
+        /**
          * tomcat-thread-1: 2초, http-nio-8080-exec 1개 와 workerThread 100개
          * tomcat-thread-20: 2초, http-nio-8080-exec 20개 와 workerThread 100개
          * tomcat-thread-100: 2초, http-nio-8080-exec 100개 와 workerThread 가 100개
          */
-        @GetMapping("/callable")
-        public Callable<String> callable() {
-            log.info("callable");
+        @GetMapping("/async/callable")
+        public Callable<String> asyncCallable() {
+            log.info("/async/callable");
             return () -> {
                 log.info("callable");
                 Thread.sleep(2000);
                 return "hello";
             };
-        }
-
-        /**
-         * tomcat-thread-20: 10초, http-nio-8080-exec 가 20개 만들어져서 20개 req 씩 처리
-         * tomcat-thread-100: 2초, http-nio-8080-exec 가 100개 만들어져서 한번에 처리
-         */
-        @GetMapping("/notcallable")
-        public String notCallable() throws InterruptedException {
-            log.info("not callable");
-            Thread.sleep(2000);
-            return "hello";
         }
     }
 
