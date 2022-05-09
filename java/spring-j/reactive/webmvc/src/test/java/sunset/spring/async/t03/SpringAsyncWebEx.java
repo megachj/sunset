@@ -25,7 +25,7 @@ import java.util.concurrent.Callable;
 public class SpringAsyncWebEx {
 
     private static final String PORT_VALUE = "8080";
-    private static final String TOMCAT_THREADS_MAX_VALUE = "100"; // 100, 20, 1
+    private static final String TOMCAT_THREADS_MAX_VALUE = "20"; // 100, 20, 1
 
     @Bean
     WebMvcConfigurer webMvcConfigurer() {

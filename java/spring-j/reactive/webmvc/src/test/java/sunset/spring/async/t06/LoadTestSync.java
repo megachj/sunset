@@ -8,14 +8,14 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
-public class LoadTest {
+public class LoadTestSync {
     static AtomicInteger counter = new AtomicInteger(0);
 
     public static void main(String[] args) throws InterruptedException, BrokenBarrierException {
         ExecutorService es = Executors.newFixedThreadPool(100);
 
         RestTemplate rt = new RestTemplate();
-        String url = "http://localhost:8080/rest?idx={idx}";
+        String url = "http://localhost:8080/rest/sync?idx={idx}";
 
         // 스레드를 동시에 실행시키기 위해서 사용
         CyclicBarrier barrier = new CyclicBarrier(100 + 1);
