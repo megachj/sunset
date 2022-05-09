@@ -6,10 +6,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Spring Boot v2.6.4 기준
+ *
+ * 설정하는 법
+ *  1. application.yaml 에서 설정
+ *  2. main 메서드에서 System.setProperty() 로 설정
+ */
 @Slf4j
 public class PropertyUtil {
-    // Spring Boot 2.6.4 기준
-    // application.yaml 로 설정해도 되고, System.setProperty() 로 설정할 수 도 있다.
     public static final String PORT = "server.port";
     public static final String TOMCAT_THREADS_MAX = "server.tomcat.threads.max";
 
