@@ -8,24 +8,24 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import sunset.spring.utils.PropertyUtil;
 
-import java.util.Queue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * 프로필을 주어서 실행하고, 서버 스레드를 관찰한다.
- * - profiles: tomcat-thread-100, tomcat-thread-20, tomcat-thread-1
+ * TOMCAT_THREADS_MAX_VALUE 값을 바꿔가며 테스트를 해본다.
  *
- * visualVm 을 통해 스레드 과정을 확인할 수 있다.
+ * jmc(JDK Mission Control) 또는 VisualVM 을 통해 스레드 과정을 확인할 수 있다.
  */
 @Slf4j
 @SpringBootApplication
 @EnableAsync
 public class SpringAsyncWebEx {
+
+    private static final String PORT_VALUE = "8080";
+    private static final String TOMCAT_THREADS_MAX_VALUE = "100"; // 100, 20, 1
 
     @Bean
     WebMvcConfigurer webMvcConfigurer() {
@@ -46,7 +46,6 @@ public class SpringAsyncWebEx {
 
     @RestController
     public static class MyController {
-        Queue<DeferredResult<String>> results = new ConcurrentLinkedQueue<>();
 
         /**
          * tomcat-thread-20: 10초, http-nio-8080-exec 가 20개 만들어져서 20개 req 씩 처리
@@ -73,31 +72,13 @@ public class SpringAsyncWebEx {
                 return "hello";
             };
         }
-
-        @GetMapping("/async/deferred-result")
-        public DeferredResult<String> asyncDeferredResult() {
-            log.info("/async/deferred-result");
-            DeferredResult<String> deferredResult = new DeferredResult<>(600000L);
-            results.add(deferredResult);
-            return deferredResult;
-        }
-
-        @GetMapping("/dr/count")
-        public String drCount() {
-            return String.valueOf(results.size());
-        }
-
-        @GetMapping("/dr/event")
-        public String drEvent(String msg) {
-            for (DeferredResult<String> dr: results) {
-                dr.setResult("Hello " + msg);
-                results.remove(dr);
-            }
-            return "OK";
-        }
     }
 
     public static void main(String[] args) {
+        System.setProperty(PropertyUtil.PORT, PORT_VALUE);
+        System.setProperty(PropertyUtil.TOMCAT_THREADS_MAX, TOMCAT_THREADS_MAX_VALUE);
+        PropertyUtil.logProperties(PropertyUtil.PORT, PropertyUtil.TOMCAT_THREADS_MAX);
+
         SpringApplication.run(SpringAsyncWebEx.class, args);
     }
 }

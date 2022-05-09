@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
+import sunset.spring.utils.PropertyUtil;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -16,6 +17,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Slf4j
 @SpringBootApplication
 public class SpringDeferredResultWebEx {
+
+    private static final String PORT_VALUE = "8080";
+    private static final String TOMCAT_THREADS_MAX_VALUE = "1";
 
     @RestController
     public static class MyController {
@@ -59,6 +63,10 @@ public class SpringDeferredResultWebEx {
     }
 
     public static void main(String[] args) {
+        System.setProperty(PropertyUtil.PORT, PORT_VALUE);
+        System.setProperty(PropertyUtil.TOMCAT_THREADS_MAX, TOMCAT_THREADS_MAX_VALUE);
+        PropertyUtil.logProperties(PropertyUtil.PORT, PropertyUtil.TOMCAT_THREADS_MAX);
+
         SpringApplication.run(SpringDeferredResultWebEx.class, args);
     }
 }
