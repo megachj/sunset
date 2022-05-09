@@ -25,6 +25,8 @@ allprojects {
         set("hibernateValidatorVersion", "7.0.0.Final")
         set("resilience4jVersion", "1.6.1")
 
+        set("nettyAllVersion", "4.1.77.Final")
+
         set("nettyVersion", "4.1.74.Final")
     }
 }

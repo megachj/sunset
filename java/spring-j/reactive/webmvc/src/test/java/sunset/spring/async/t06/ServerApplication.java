@@ -1,9 +1,11 @@
 package sunset.spring.async.t06;
 
+import io.netty.channel.nio.NioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.Netty4ClientHttpRequestFactory;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +23,14 @@ public class ServerApplication {
     @RestController
     public static class MyController {
         RestTemplate rt = new RestTemplate(); // blocking
-        AsyncRestTemplate art = new AsyncRestTemplate(); // non-blocking
+
+        // 내부가 요청당 스레드를 1개 생성해서 처리하는 구조, 즉 blocking-io
+        // ex) 요청이 동시에 100개 들어오면, 대기 스레드가 100개 만들어짐
+        AsyncRestTemplate ioArt = new AsyncRestTemplate();
+
+        // 내부를 nio 네티로 구성, 즉 nonblocking-io
+        // ex) 요청이 동시에 100개 들어와도 처리 스레드는 1개임
+        AsyncRestTemplate nioArt = new AsyncRestTemplate(new Netty4ClientHttpRequestFactory(new NioEventLoopGroup(1)));
 
         @GetMapping("/rest/sync")
         public String restSync(int idx) {
@@ -29,9 +38,15 @@ public class ServerApplication {
             return res;
         }
 
-        @GetMapping("/rest/async")
-        public ListenableFuture<ResponseEntity<String>> restAsync(int idx) {
-            ListenableFuture<ResponseEntity<String>> res = art.getForEntity("http://localhost:8081/service?req={req}", String.class, "hello" + idx);
+        @GetMapping("/rest/async/io")
+        public ListenableFuture<ResponseEntity<String>> restAsyncIo(int idx) {
+            ListenableFuture<ResponseEntity<String>> res = ioArt.getForEntity("http://localhost:8081/service?req={req}", String.class, "hello" + idx);
+            return res;
+        }
+
+        @GetMapping("/rest/async/nio")
+        public ListenableFuture<ResponseEntity<String>> restAsyncNio(int idx) {
+            ListenableFuture<ResponseEntity<String>> res = nioArt.getForEntity("http://localhost:8081/service?req={req}", String.class, "hello" + idx);
             return res;
         }
     }

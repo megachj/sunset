@@ -8,7 +8,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
-public class LoadTestAsync {
+public class LoadTestAsyncIo {
 
     static AtomicInteger counter = new AtomicInteger(0);
 
@@ -16,7 +16,7 @@ public class LoadTestAsync {
         ExecutorService es = Executors.newFixedThreadPool(100);
 
         RestTemplate rt = new RestTemplate();
-        String url = "http://localhost:8080/rest/async?idx={idx}";
+        String url = "http://localhost:8080/rest/async/io?idx={idx}";
 
         // 스레드를 동시에 실행시키기 위해서 사용
         CyclicBarrier barrier = new CyclicBarrier(100 + 1);
