@@ -35,6 +35,7 @@ public class ServerApplication {
 
         @GetMapping("/rest/sync")
         public String restSync(int idx) {
+            // 2초
             String res = rt.getForObject(
                 "http://localhost:8081/service?req={req}",
                 String.class,
@@ -45,6 +46,7 @@ public class ServerApplication {
 
         @GetMapping("/rest/async/io")
         public ListenableFuture<ResponseEntity<String>> restAsyncIo(int idx) {
+            // 2초
             ListenableFuture<ResponseEntity<String>> res = ioArt.getForEntity(
                 "http://localhost:8081/service?req={req}",
                 String.class,
@@ -55,6 +57,7 @@ public class ServerApplication {
 
         @GetMapping("/rest/async/nio")
         public ListenableFuture<ResponseEntity<String>> restAsyncNio(int idx) {
+            // 2초
             ListenableFuture<ResponseEntity<String>> res = nioArt.getForEntity(
                 "http://localhost:8081/service?req={req}",
                 String.class,
@@ -67,6 +70,7 @@ public class ServerApplication {
         public DeferredResult<String> restAsyncNioDeferred(int idx) {
             DeferredResult<String> dr = new DeferredResult<>();
 
+            // 2초
             ListenableFuture<ResponseEntity<String>> f1 = nioArt.getForEntity(
                 "http://localhost:8081/service?req={req}",
                 String.class,
@@ -88,6 +92,7 @@ public class ServerApplication {
         public DeferredResult<String> restAsyncNioDeferredCallbackHell(int idx) {
             DeferredResult<String> dr = new DeferredResult<>();
 
+            // 2초
             ListenableFuture<ResponseEntity<String>> f1 = nioArt.getForEntity(
                 "http://localhost:8081/service?req={req}",
                 String.class,
@@ -95,6 +100,7 @@ public class ServerApplication {
             );
             f1.addCallback(
                 s -> {
+                    // 2초
                     ListenableFuture<ResponseEntity<String>> f2 = nioArt.getForEntity(
                         "http://localhost:8081/service2?req={req}",
                         String.class,
