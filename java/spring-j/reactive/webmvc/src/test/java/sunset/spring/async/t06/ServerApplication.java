@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.async.DeferredResult;
 import sunset.spring.utils.PropertyUtil;
 
 @Slf4j
@@ -34,20 +35,86 @@ public class ServerApplication {
 
         @GetMapping("/rest/sync")
         public String restSync(int idx) {
-            String res = rt.getForObject("http://localhost:8081/service?req={req}", String.class, "hello" + idx);
+            String res = rt.getForObject(
+                "http://localhost:8081/service?req={req}",
+                String.class,
+                "hello" + idx
+            );
             return res;
         }
 
         @GetMapping("/rest/async/io")
         public ListenableFuture<ResponseEntity<String>> restAsyncIo(int idx) {
-            ListenableFuture<ResponseEntity<String>> res = ioArt.getForEntity("http://localhost:8081/service?req={req}", String.class, "hello" + idx);
+            ListenableFuture<ResponseEntity<String>> res = ioArt.getForEntity(
+                "http://localhost:8081/service?req={req}",
+                String.class,
+                "hello" + idx
+            );
             return res;
         }
 
         @GetMapping("/rest/async/nio")
         public ListenableFuture<ResponseEntity<String>> restAsyncNio(int idx) {
-            ListenableFuture<ResponseEntity<String>> res = nioArt.getForEntity("http://localhost:8081/service?req={req}", String.class, "hello" + idx);
+            ListenableFuture<ResponseEntity<String>> res = nioArt.getForEntity(
+                "http://localhost:8081/service?req={req}",
+                String.class,
+                "hello" + idx
+            );
             return res;
+        }
+
+        @GetMapping("/rest/async/nio/deferred")
+        public DeferredResult<String> restAsyncNioDeferred(int idx) {
+            DeferredResult<String> dr = new DeferredResult<>();
+
+            ListenableFuture<ResponseEntity<String>> f1 = nioArt.getForEntity(
+                "http://localhost:8081/service?req={req}",
+                String.class,
+                "hello" + idx
+            );
+            f1.addCallback(
+                s -> {
+                    dr.setResult(s.getBody() + "/work");
+                },
+                e -> {
+                    dr.setErrorResult(e.getMessage());
+                }
+            );
+
+            return dr;
+        }
+
+        @GetMapping("/rest/async/nio/deferred/callback-hell")
+        public DeferredResult<String> restAsyncNioDeferredCallbackHell(int idx) {
+            DeferredResult<String> dr = new DeferredResult<>();
+
+            ListenableFuture<ResponseEntity<String>> f1 = nioArt.getForEntity(
+                "http://localhost:8081/service?req={req}",
+                String.class,
+                "hello" + idx
+            );
+            f1.addCallback(
+                s -> {
+                    ListenableFuture<ResponseEntity<String>> f2 = nioArt.getForEntity(
+                        "http://localhost:8081/service2?req={req}",
+                        String.class,
+                        s.getBody()
+                    );
+                    f2.addCallback(
+                        s2 -> {
+                            dr.setResult(s2.getBody());
+                        },
+                        e2 -> {
+                            dr.setErrorResult(e2.getMessage());
+                        }
+                    );
+                },
+                e -> {
+                    dr.setErrorResult(e.getMessage());
+                }
+            );
+
+            return dr;
         }
     }
 
