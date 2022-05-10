@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketMessage;
+import org.springframework.web.reactive.socket.WebSocketMessage.Type;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -40,8 +41,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
         long connectionLiveSeconds = (Long) session.getAttributes()
             .get(ChatHandshakeWebSocketService.CONNECTION_LIVE_SECONDS_ATTRIBUTE_NAME);
 
-        Mono<Void> input = session.receive()
-            //.log("session.receive()")
+        Flux<WebSocketMessage> syncUserNicknameSource = session.receive()
             .take(Duration.ofSeconds(connectionLiveSeconds), wsConnTimer)
             .doOnSubscribe(subscription -> {
                 log.info("Connection[userId: {}, sessionId: {}, connection-live-seconds: {}] is established",
@@ -61,18 +61,17 @@ public class ChatWebSocketHandler implements WebSocketHandler {
                 log.info("Connection[userId: {}, sessionId: {}] is closed on cancel", userId, session.getId());
                 sessionRepository.removeSession(userId, session);
             })
-            .doOnNext(webSocketMessage -> {
-                ChatMessage chatMessage = ChatMessage.parsePayload(userId, webSocketMessage.getPayloadAsText());
-
+            .filter(webSocketMessage -> webSocketMessage.getType() == Type.TEXT)
+            .map(webSocketMessage -> ChatMessage.parsePayload(userId, webSocketMessage.getPayloadAsText()))
+            .doOnNext(chatMessage -> {
                 log.info("From[sessionId: {}]: {}", session.getId(), chatMessage);
                 simpleChatMessagePubSubService.sendMessage(chatMessage);
-                externalWebClient.getSyncUserNickName(userId)
-                    .doOnNext(next -> asyncUserNicknamePubSubService.sendMessage(next))
-                    .subscribe();
                 externalWebClient.getAsyncUserNickName(userId)
                     .subscribe();
             })
-            .then();
+            .concatMap(chatMessage -> externalWebClient.getSyncUserNickName(userId))
+            .map(userNicknameInfo -> String.format("UserNicknameInfo: %s", userNicknameInfo))
+            .map(session::textMessage);
 
         Flux<WebSocketMessage> chatMessageSource = simpleChatMessagePubSubService.listen(userId)
             .map(chatMessage -> String.format("from %s: %s",
@@ -81,14 +80,14 @@ public class ChatWebSocketHandler implements WebSocketHandler {
             )
             .map(session::textMessage);
 
-        Flux<WebSocketMessage> userNicknameSource = asyncUserNicknamePubSubService.listen(userId)
+        Flux<WebSocketMessage> asyncUserNicknameSource = asyncUserNicknamePubSubService.listen(userId)
             .map(userNicknameInfo -> String.format("UserNicknameInfo: %s", userNicknameInfo))
             .map(session::textMessage);
 
         Mono<Void> output = session.send(
-            Flux.merge(chatMessageSource, userNicknameSource)
+            Flux.merge(syncUserNicknameSource, chatMessageSource, asyncUserNicknameSource)
         );
 
-        return Mono.zip(input, output).then();
+        return output;
     }
 }
