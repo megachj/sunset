@@ -29,6 +29,9 @@ public class ServerApplication {
     private static final String PORT_VALUE = "8080";
     private static final String TOMCAT_THREADS_MAX_VALUE = "1";
 
+    private static final String REMOTE_URL1 = "http://localhost:8081/service?req={req}";
+    private static final String REMOTE_URL2 = "http://localhost:8081/service2?req={req}";
+
     @RestController
     public static class MyController {
         RestTemplate rt = new RestTemplate(); // blocking
@@ -48,7 +51,7 @@ public class ServerApplication {
         public String restSync(int idx) {
             // 2초
             String res = rt.getForObject(
-                "http://localhost:8081/service?req={req}",
+                REMOTE_URL1,
                 String.class,
                 "hello" + idx
             );
@@ -59,7 +62,7 @@ public class ServerApplication {
         public ListenableFuture<ResponseEntity<String>> restAsyncIo(int idx) {
             // 2초
             ListenableFuture<ResponseEntity<String>> res = ioArt.getForEntity(
-                "http://localhost:8081/service?req={req}",
+                REMOTE_URL1,
                 String.class,
                 "hello" + idx
             );
@@ -70,7 +73,7 @@ public class ServerApplication {
         public ListenableFuture<ResponseEntity<String>> restAsyncNio(int idx) {
             // 2초
             ListenableFuture<ResponseEntity<String>> res = nioArt.getForEntity(
-                "http://localhost:8081/service?req={req}",
+                REMOTE_URL1,
                 String.class,
                 "hello" + idx
             );
@@ -83,7 +86,7 @@ public class ServerApplication {
 
             // 2초
             ListenableFuture<ResponseEntity<String>> f1 = nioArt.getForEntity(
-                "http://localhost:8081/service?req={req}",
+                REMOTE_URL1,
                 String.class,
                 "hello" + idx
             );
@@ -105,7 +108,7 @@ public class ServerApplication {
 
             // 2초
             ListenableFuture<ResponseEntity<String>> f1 = nioArt.getForEntity(
-                "http://localhost:8081/service?req={req}",
+                REMOTE_URL1,
                 String.class,
                 "hello" + idx
             );
@@ -113,7 +116,7 @@ public class ServerApplication {
                 s -> {
                     // 2초
                     ListenableFuture<ResponseEntity<String>> f2 = nioArt.getForEntity(
-                        "http://localhost:8081/service2?req={req}",
+                        REMOTE_URL2,
                         String.class,
                         s.getBody()
                     );
