@@ -21,6 +21,8 @@ public class SpringAsyncEx {
 
     @Component
     public static class MyService {
+
+        // 스프링 빈으로 등록한 tp 스레드 풀에서 작업하게 됨
         @Async("tp")
         public ListenableFuture<String> hello() throws InterruptedException {
             log.debug("hello()");
