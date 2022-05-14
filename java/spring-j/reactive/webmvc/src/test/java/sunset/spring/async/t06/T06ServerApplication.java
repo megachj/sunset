@@ -24,7 +24,7 @@ import sunset.spring.utils.PropertyUtil;
 @Slf4j
 @SpringBootApplication
 @EnableAsync
-public class ServerApplication {
+public class T06ServerApplication {
 
     private static final String PORT_VALUE = "8080";
     private static final String TOMCAT_THREADS_MAX_VALUE = "1";
@@ -34,15 +34,18 @@ public class ServerApplication {
 
     @RestController
     public static class MyController {
-        RestTemplate rt = new RestTemplate(); // blocking
+        // sync, blocking io
+        RestTemplate syncRt = new RestTemplate(); // blocking
 
+        // async, blocking io
         // 내부가 요청당 스레드를 1개 생성해서 처리하는 구조, 즉 blocking-io
         // ex) 요청이 동시에 100개 들어오면, 대기 스레드가 100개 만들어짐
-        AsyncRestTemplate ioArt = new AsyncRestTemplate();
+        AsyncRestTemplate ioAsyncRt = new AsyncRestTemplate();
 
+        // async, non-blocking io
         // 내부를 nio 네티로 구성, 즉 nonblocking-io
         // ex) 요청이 동시에 100개 들어와도 처리 스레드는 1개임
-        AsyncRestTemplate nioArt = new AsyncRestTemplate(new Netty4ClientHttpRequestFactory(new NioEventLoopGroup(1)));
+        AsyncRestTemplate nioAsyncRt = new AsyncRestTemplate(new Netty4ClientHttpRequestFactory(new NioEventLoopGroup(1)));
 
         @Autowired
         MyService myService;
@@ -50,7 +53,7 @@ public class ServerApplication {
         @GetMapping("/rest/sync")
         public String restSync(int idx) {
             // 2초
-            String res = rt.getForObject(
+            String res = syncRt.getForObject(
                 REMOTE_URL1,
                 String.class,
                 "hello" + idx
@@ -61,7 +64,7 @@ public class ServerApplication {
         @GetMapping("/rest/async/io")
         public ListenableFuture<ResponseEntity<String>> restAsyncIo(int idx) {
             // 2초
-            ListenableFuture<ResponseEntity<String>> res = ioArt.getForEntity(
+            ListenableFuture<ResponseEntity<String>> res = ioAsyncRt.getForEntity(
                 REMOTE_URL1,
                 String.class,
                 "hello" + idx
@@ -72,7 +75,7 @@ public class ServerApplication {
         @GetMapping("/rest/async/nio")
         public ListenableFuture<ResponseEntity<String>> restAsyncNio(int idx) {
             // 2초
-            ListenableFuture<ResponseEntity<String>> res = nioArt.getForEntity(
+            ListenableFuture<ResponseEntity<String>> res = nioAsyncRt.getForEntity(
                 REMOTE_URL1,
                 String.class,
                 "hello" + idx
@@ -85,16 +88,14 @@ public class ServerApplication {
             DeferredResult<String> dr = new DeferredResult<>();
 
             // 2초
-            ListenableFuture<ResponseEntity<String>> f1 = nioArt.getForEntity(
+            ListenableFuture<ResponseEntity<String>> f1 = nioAsyncRt.getForEntity(
                 REMOTE_URL1,
                 String.class,
                 "hello" + idx
             );
-            f1.addCallback(
-                s -> {
+            f1.addCallback(s -> {
                     dr.setResult(s.getBody() + "/work");
-                },
-                e -> {
+                }, e -> {
                     dr.setErrorResult(e.getMessage());
                 }
             );
@@ -107,40 +108,46 @@ public class ServerApplication {
             DeferredResult<String> dr = new DeferredResult<>();
 
             // 2초
-            ListenableFuture<ResponseEntity<String>> f1 = nioArt.getForEntity(
+            ListenableFuture<ResponseEntity<String>> f1 = nioAsyncRt.getForEntity(
                 REMOTE_URL1,
                 String.class,
                 "hello" + idx
             );
-            f1.addCallback(
-                s -> {
-                    // 2초
-                    ListenableFuture<ResponseEntity<String>> f2 = nioArt.getForEntity(
+            f1.addCallback(s -> {
+                    ListenableFuture<ResponseEntity<String>> f2 = nioAsyncRt.getForEntity(
                         REMOTE_URL2,
                         String.class,
                         s.getBody()
                     );
-                    f2.addCallback(
-                        s2 -> {
+                    f2.addCallback(s2 -> {
                             ListenableFuture<String> f3 = myService.work(s2.getBody());
-                            f3.addCallback(
-                                s3 -> {
+                            f3.addCallback(s3 -> {
                                     dr.setResult(s3);
-                                },
-                                e3 -> {
+                                }, e3 -> {
                                     dr.setErrorResult(e3.getMessage());
                                 }
                             );
-                        },
-                        e2 -> {
+                        }, e2 -> {
                             dr.setErrorResult(e2.getMessage());
                         }
                     );
-                },
-                e -> {
+                }, e -> {
                     dr.setErrorResult(e.getMessage());
                 }
             );
+
+            return dr;
+        }
+
+        @GetMapping("/rest/completion")
+        public DeferredResult<String> restCompletion(int idx) {
+            DeferredResult<String> dr = new DeferredResult<>();
+
+            Completion.from(nioAsyncRt.getForEntity(REMOTE_URL1, String.class, "hello" + idx))
+                .andApply(s -> nioAsyncRt.getForEntity(REMOTE_URL2, String.class, s.getBody()))
+                .andApply(s -> myService.work(s.getBody()))
+                .andError(e -> dr.setErrorResult(e.toString()))
+                .andAccept(s -> dr.setResult(s));
 
             return dr;
         }
@@ -169,6 +176,6 @@ public class ServerApplication {
         System.setProperty(PropertyUtil.TOMCAT_THREADS_MAX, TOMCAT_THREADS_MAX_VALUE);
         PropertyUtil.logProperties(PropertyUtil.PORT, PropertyUtil.TOMCAT_THREADS_MAX);
 
-        SpringApplication.run(ServerApplication.class, args);
+        SpringApplication.run(T06ServerApplication.class, args);
     }
 }

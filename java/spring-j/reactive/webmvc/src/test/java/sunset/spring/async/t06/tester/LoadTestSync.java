@@ -1,4 +1,4 @@
-package sunset.spring.async.t06;
+package sunset.spring.async.t06.tester;
 
 import sunset.spring.utils.LoadTester;
 
