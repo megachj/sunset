@@ -161,7 +161,7 @@ public class T06ServerApplication {
             toCompletableFuture(nioAsyncRt.getForEntity(REMOTE_URL1, String.class, "hello" + idx))
                 .thenCompose(s -> {
                     if (s.getBody().contains("10")) {
-                        throw new RuntimeException("ERROR");
+                        throw new RuntimeException(String.format("ERROR: %s", s.getBody()));
                     }
 
                     return toCompletableFuture(nioAsyncRt.getForEntity(REMOTE_URL2, String.class, s.getBody()));
