@@ -1,4 +1,4 @@
-package sunset.spring.async.t07;
+package sunset.spring.async.webflux;
 
 import sunset.springutils.LoadTester;
 

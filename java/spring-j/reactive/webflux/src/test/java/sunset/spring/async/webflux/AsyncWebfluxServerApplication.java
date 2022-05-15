@@ -1,4 +1,4 @@
-package sunset.spring.async.t07;
+package sunset.spring.async.webflux;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @SpringBootApplication
 @EnableAsync
-public class T07ServerApplication {
+public class AsyncWebfluxServerApplication {
 
     private static final String PORT_VALUE = "8080";
 
@@ -60,6 +60,6 @@ public class T07ServerApplication {
         System.setProperty(PropertyUtil.PORT, PORT_VALUE);
         PropertyUtil.logProperties(PropertyUtil.PORT);
 
-        SpringApplication.run(T07ServerApplication.class, args);
+        SpringApplication.run(AsyncWebfluxServerApplication.class, args);
     }
 }
