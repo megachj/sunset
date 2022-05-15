@@ -21,6 +21,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.async.DeferredResult;
 import sunset.spring.utils.PropertyUtil;
 
+import java.util.concurrent.CompletableFuture;
+
 @Slf4j
 @SpringBootApplication
 @EnableAsync
@@ -120,7 +122,7 @@ public class T06ServerApplication {
                         s.getBody()
                     );
                     f2.addCallback(s2 -> {
-                            ListenableFuture<String> f3 = myService.work(s2.getBody());
+                            ListenableFuture<String> f3 = myService.asyncWork(s2.getBody());
                             f3.addCallback(s3 -> {
                                     dr.setResult(s3);
                                 }, e3 -> {
@@ -145,19 +147,51 @@ public class T06ServerApplication {
 
             Completion.from(nioAsyncRt.getForEntity(REMOTE_URL1, String.class, "hello" + idx))
                 .andApply(s -> nioAsyncRt.getForEntity(REMOTE_URL2, String.class, s.getBody()))
-                .andApply(s -> myService.work(s.getBody()))
+                .andApply(s -> myService.asyncWork(s.getBody()))
                 .andError(e -> dr.setErrorResult(e.toString()))
                 .andAccept(s -> dr.setResult(s));
 
             return dr;
+        }
+
+        @GetMapping("/rest/completable-future")
+        public DeferredResult<String> restCompletableFuture(int idx) {
+            DeferredResult<String> dr = new DeferredResult<>();
+
+            toCompletableFuture(nioAsyncRt.getForEntity(REMOTE_URL1, String.class, "hello" + idx))
+                .thenCompose(s -> {
+                    if (s.getBody().contains("10")) {
+                        throw new RuntimeException("ERROR");
+                    }
+
+                    return toCompletableFuture(nioAsyncRt.getForEntity(REMOTE_URL2, String.class, s.getBody()));
+                })
+                .thenApplyAsync(s2 -> myService.syncWork(s2.getBody()))
+                .thenAccept(s3 -> dr.setResult(s3))
+                .exceptionally(e -> {
+                    dr.setErrorResult(e.getMessage());
+                    return null;
+                });
+
+            return dr;
+        }
+
+        private <T> CompletableFuture<T> toCompletableFuture(ListenableFuture<T> lf) {
+            CompletableFuture<T> cf = new CompletableFuture<>();
+            lf.addCallback(s -> cf.complete(s), e -> cf.completeExceptionally(e));
+            return cf;
         }
     }
 
     @Component
     public static class MyService {
         @Async("tp")
-        public ListenableFuture<String> work(String req) {
-            return new AsyncResult<>(req + "/asyncwork");
+        public ListenableFuture<String> asyncWork(String req) {
+            return new AsyncResult<>(req + "/asyncWork");
+        }
+
+        public String syncWork(String req) {
+            return req + "/syncWork";
         }
     }
 
