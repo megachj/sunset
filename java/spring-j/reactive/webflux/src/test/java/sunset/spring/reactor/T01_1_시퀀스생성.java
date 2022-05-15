@@ -1,4 +1,4 @@
-package sunset.spring.webflux;
+package sunset.spring.reactor;
 
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
