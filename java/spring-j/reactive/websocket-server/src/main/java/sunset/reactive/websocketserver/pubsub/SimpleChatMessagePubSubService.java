@@ -1,5 +1,6 @@
 package sunset.reactive.websocketserver.pubsub;
 
+import java.util.Locale;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,18 +19,18 @@ import sunset.reactive.websocketserver.model.ChatMessage;
 public class SimpleChatMessagePubSubService implements PubSubService<ChatMessage> {
 
     private Channel<ChatMessage> channel;
-    private ConnectableFlux<ChatMessage> hotSource;
+    private ConnectableFlux<ChatMessage> receivedMessageHotSource;
 
     @PostConstruct
     public void init() {
         channel = Channel.connectNewChannel();
 
-        hotSource = Flux.create((FluxSink<ChatMessage> sink) -> {
+        receivedMessageHotSource = Flux.create((FluxSink<ChatMessage> sink) -> {
                 channel.setListener(
                     new ChannelListener<>() {
                         @Override
                         public void onData(ChatMessage chatMessage) {
-                            sink.next(chatMessage); // Subscriber의 요청에 상관없이 신호 발생
+                            sink.next(chatMessage);
                         }
 
                         @Override
@@ -41,7 +42,7 @@ public class SimpleChatMessagePubSubService implements PubSubService<ChatMessage
                 );
             }, OverflowStrategy.IGNORE)
             .publish();
-        hotSource.connect();
+        receivedMessageHotSource.connect();
     }
 
     @Override
@@ -51,9 +52,11 @@ public class SimpleChatMessagePubSubService implements PubSubService<ChatMessage
 
     @Override
     public Flux<ChatMessage> listen(String userId) {
-        return hotSource
+        return receivedMessageHotSource
             .filter(chatMessage ->
-                userId.equals(chatMessage.getToUserId()) || userId.equals(chatMessage.getFromUserId())
+                "all".equals(chatMessage.getToUserId().toLowerCase(Locale.ROOT)) ||
+                    userId.equals(chatMessage.getToUserId()) ||
+                    userId.equals(chatMessage.getFromUserId())
             );
     }
 }
