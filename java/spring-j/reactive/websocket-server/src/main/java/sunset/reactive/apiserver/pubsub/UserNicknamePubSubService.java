@@ -1,4 +1,4 @@
-package sunset.reactive.websocketserver.pubsub;
+package sunset.reactive.apiserver.pubsub;
 
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -8,9 +8,10 @@ import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.FluxSink.OverflowStrategy;
-import sunset.reactive.externalrestserver.UserNicknameInfo;
-import sunset.reactive.websocketserver.channel.Channel;
-import sunset.reactive.websocketserver.channel.ChannelListener;
+import sunset.reactive.common.pubsub.PubSubService;
+import sunset.reactive.remoteserver.UserNicknameInfo;
+import sunset.reactive.common.channel.Channel;
+import sunset.reactive.common.channel.ChannelListener;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -18,13 +19,13 @@ import sunset.reactive.websocketserver.channel.ChannelListener;
 public class UserNicknamePubSubService implements PubSubService<UserNicknameInfo> {
 
     private Channel<UserNicknameInfo> channel;
-    private ConnectableFlux<UserNicknameInfo> hotSource;
+    private ConnectableFlux<UserNicknameInfo> hotSourcePublisher;
 
     @PostConstruct
     public void init() {
         channel = Channel.connectNewChannel();
 
-        hotSource = Flux.create((FluxSink<UserNicknameInfo> sink) -> {
+        hotSourcePublisher = Flux.create((FluxSink<UserNicknameInfo> sink) -> {
                 channel.setListener(
                     new ChannelListener<>() {
                         @Override
@@ -41,7 +42,7 @@ public class UserNicknamePubSubService implements PubSubService<UserNicknameInfo
                 );
             }, OverflowStrategy.IGNORE)
             .publish();
-        hotSource.connect();
+        hotSourcePublisher.connect();
     }
 
     @Override
@@ -51,7 +52,7 @@ public class UserNicknamePubSubService implements PubSubService<UserNicknameInfo
 
     @Override
     public Flux<UserNicknameInfo> listen(String userId) {
-        return hotSource
+        return hotSourcePublisher
             .filter(userNicknameInfo -> userId.equals(userNicknameInfo.getUserId()));
     }
 }

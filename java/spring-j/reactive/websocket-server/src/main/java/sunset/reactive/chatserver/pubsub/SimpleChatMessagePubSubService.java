@@ -1,4 +1,4 @@
-package sunset.reactive.websocketserver.pubsub;
+package sunset.reactive.chatserver.pubsub;
 
 import java.util.Locale;
 import javax.annotation.PostConstruct;
@@ -9,9 +9,10 @@ import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.FluxSink.OverflowStrategy;
-import sunset.reactive.websocketserver.channel.Channel;
-import sunset.reactive.websocketserver.channel.ChannelListener;
-import sunset.reactive.websocketserver.model.ChatMessage;
+import sunset.reactive.common.channel.Channel;
+import sunset.reactive.common.channel.ChannelListener;
+import sunset.reactive.chatserver.model.ChatMessage;
+import sunset.reactive.common.pubsub.PubSubService;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -19,13 +20,13 @@ import sunset.reactive.websocketserver.model.ChatMessage;
 public class SimpleChatMessagePubSubService implements PubSubService<ChatMessage> {
 
     private Channel<ChatMessage> channel;
-    private ConnectableFlux<ChatMessage> receivedMessageHotSource;
+    private ConnectableFlux<ChatMessage> hotSourcePublisher;
 
     @PostConstruct
     public void init() {
         channel = Channel.connectNewChannel();
 
-        receivedMessageHotSource = Flux.create((FluxSink<ChatMessage> sink) -> {
+        hotSourcePublisher = Flux.create((FluxSink<ChatMessage> sink) -> {
                 channel.setListener(
                     new ChannelListener<>() {
                         @Override
@@ -42,7 +43,7 @@ public class SimpleChatMessagePubSubService implements PubSubService<ChatMessage
                 );
             }, OverflowStrategy.IGNORE)
             .publish();
-        receivedMessageHotSource.connect();
+        hotSourcePublisher.connect();
     }
 
     @Override
@@ -52,7 +53,7 @@ public class SimpleChatMessagePubSubService implements PubSubService<ChatMessage
 
     @Override
     public Flux<ChatMessage> listen(String userId) {
-        return receivedMessageHotSource
+        return hotSourcePublisher
             .filter(chatMessage ->
                 "all".equals(chatMessage.getToUserId().toLowerCase(Locale.ROOT)) ||
                     userId.equals(chatMessage.getToUserId()) ||

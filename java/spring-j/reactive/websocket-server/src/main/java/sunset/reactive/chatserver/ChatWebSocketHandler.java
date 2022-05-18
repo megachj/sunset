@@ -1,4 +1,4 @@
-package sunset.reactive.websocketserver.websocketconfig;
+package sunset.reactive.chatserver;
 
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
@@ -11,10 +11,10 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
-import sunset.reactive.websocketserver.model.ChatMessage;
-import sunset.reactive.websocketserver.pubsub.PubSubService;
-import sunset.reactive.websocketserver.websocketconfig.handshake.AuthUser;
-import sunset.reactive.websocketserver.websocketconfig.handshake.HandshakeWebSocketMainService;
+import sunset.reactive.chatserver.model.ChatMessage;
+import sunset.reactive.common.pubsub.PubSubService;
+import sunset.reactive.common.websocketconfig.handshake.AuthUser;
+import sunset.reactive.common.websocketconfig.handshake.HandshakeWebSocketMainService;
 
 @Slf4j
 @RequiredArgsConstructor

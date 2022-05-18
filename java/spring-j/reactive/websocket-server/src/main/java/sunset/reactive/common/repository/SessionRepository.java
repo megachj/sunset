@@ -1,4 +1,4 @@
-package sunset.reactive.websocketserver.repository;
+package sunset.reactive.common.repository;
 
 import java.util.Collection;
 import java.util.Optional;

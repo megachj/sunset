@@ -1,4 +1,4 @@
-package sunset.reactive.websocketserver.websocketconfig.handshake;
+package sunset.reactive.common.websocketconfig.handshake;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

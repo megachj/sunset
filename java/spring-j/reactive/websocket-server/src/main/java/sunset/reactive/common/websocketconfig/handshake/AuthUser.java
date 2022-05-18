@@ -1,4 +1,4 @@
-package sunset.reactive.websocketserver.websocketconfig.handshake;
+package sunset.reactive.common.websocketconfig.handshake;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

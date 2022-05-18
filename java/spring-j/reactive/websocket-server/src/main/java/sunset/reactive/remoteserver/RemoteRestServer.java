@@ -1,51 +1,49 @@
-package sunset.reactive.externalrestserver;
+package sunset.reactive.remoteserver;
 
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
-import sunset.reactive.websocketserver.pubsub.UserNicknamePubSubService;
+import sunset.reactive.apiserver.pubsub.UserNicknamePubSubService;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-public class ExternalRestServer {
+public class RemoteRestServer {
 
-    private final UserNicknamePubSubService asyncUserNicknamePubSubService;
+    private final UserNicknamePubSubService userNicknamePubSubService;
     private final Scheduler asyncJobScheduler;
 
-    @GetMapping("/api/users/{userId}/nickname/sync")
-    public Mono<UserNicknameInfo> getSyncUserNickName(
+    @GetMapping("/api/users/{userId}/nickname")
+    public Mono<UserNicknameInfo> getUserNickName(
         @PathVariable("userId") String userId
     ) {
-        log.info("External rest server: sync");
         return Mono.just(UserNicknameInfo.builder()
             .userId(userId)
-            .userNickname("이말년")
+            .userNickname(userId + "_sync")
             .build());
     }
 
-    @GetMapping("/api/users/{userId}/nickname/async")
-    public Mono<Void> getAsyncUserNickName(
+    @PostMapping("/api/users/{userId}/latest-nickname/pub")
+    public Mono<Void> pubLatestUserNickNameEvent(
         @PathVariable("userId") String userId
     ) {
-        log.info("External rest server: async start");
         Mono
-            .delay(Duration.ofSeconds(5), asyncJobScheduler)
+            .delay(Duration.ofSeconds(3), asyncJobScheduler)
             .doOnNext(next -> {
-                asyncUserNicknamePubSubService.sendMessage(
+                userNicknamePubSubService.sendMessage(
                     UserNicknameInfo.builder()
                         .userId(userId)
-                        .userNickname("침착맨")
+                        .userNickname(userId + "_pubEvent")
                         .build()
                 );
             })
             .subscribe();
-        log.info("External rest server: async end");
 
         return Mono.empty();
     }

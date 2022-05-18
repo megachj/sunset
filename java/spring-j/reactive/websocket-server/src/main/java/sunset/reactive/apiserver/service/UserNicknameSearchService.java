@@ -1,25 +1,27 @@
-package sunset.reactive.websocketserver.webclient;
+package sunset.reactive.apiserver.service;
 
-import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import sunset.reactive.externalrestserver.UserNicknameInfo;
+import sunset.reactive.remoteserver.UserNicknameInfo;
 
-@Component
-public class ExternalWebClient {
+@Slf4j
+@Service
+public class UserNicknameSearchService {
 
     private final WebClient webClient;
 
-    public ExternalWebClient(
+    public UserNicknameSearchService(
         WebClient.Builder webClientBuilder
     ) {
         this.webClient = webClientBuilder.baseUrl("http://localhost:8080").build();
     }
 
-    public Mono<UserNicknameInfo> getSyncUserNickName(String userId) {
+    public Mono<UserNicknameInfo> getUserNickname(String userId) {
         return this.webClient
             .get()
-            .uri(uriBuilder -> uriBuilder.path("/api/users/{userId}/nickname/sync")
+            .uri(uriBuilder -> uriBuilder.path("/api/users/{userId}/nickname")
                 .pathSegment()
                 .build(userId)
             )
@@ -27,10 +29,10 @@ public class ExternalWebClient {
             .bodyToMono(UserNicknameInfo.class);
     }
 
-    public Mono<Void> getAsyncUserNickName(String userId) {
+    public Mono<Void> pubLatestUserNickname(String userId) {
         return this.webClient
-            .get()
-            .uri(uriBuilder -> uriBuilder.path("/api/users/{userId}/nickname/async")
+            .post()
+            .uri(uriBuilder -> uriBuilder.path("/api/users/{userId}/latest-nickname/pub")
                 .pathSegment()
                 .build(userId)
             )

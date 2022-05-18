@@ -1,6 +1,6 @@
-package sunset.reactive.websocketserver.websocketconfig;
+package sunset.reactive.common.websocketconfig;
 
-import java.util.Collections;
+import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.HandlerAdapter;
@@ -12,16 +12,25 @@ import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAd
 import org.springframework.web.reactive.socket.server.upgrade.ReactorNettyRequestUpgradeStrategy;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
-import sunset.reactive.websocketserver.websocketconfig.handshake.HandshakeWebSocketMainService;
+import sunset.reactive.common.websocketconfig.handshake.HandshakeWebSocketMainService;
+import sunset.reactive.apiserver.ApiWebSocketHandler;
+import sunset.reactive.chatserver.ChatWebSocketHandler;
 
 @Configuration
 @EnableWebFlux
 public class WebSocketConfiguration {
 
     @Bean
-    public HandlerMapping handlerMapping(ChatWebSocketHandler chatWebSocketHandler) {
+    public HandlerMapping handlerMapping(ChatWebSocketHandler chatWebSocketHandler,
+        ApiWebSocketHandler apiWebSocketHandler
+    ) {
         SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
-        mapping.setUrlMap(Collections.singletonMap("/chat/open", chatWebSocketHandler));
+        mapping.setUrlMap(
+            Map.of(
+                "/chat/open", chatWebSocketHandler,
+                "/api/open", apiWebSocketHandler
+            )
+        );
         mapping.setOrder(0);
         return mapping;
     }

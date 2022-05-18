@@ -1,4 +1,4 @@
-package sunset.reactive.websocketserver.pubsub;
+package sunset.reactive.common.pubsub;
 
 import reactor.core.publisher.Flux;
 

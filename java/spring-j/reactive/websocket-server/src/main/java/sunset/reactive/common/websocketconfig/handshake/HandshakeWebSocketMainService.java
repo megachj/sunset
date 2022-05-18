@@ -1,4 +1,4 @@
-package sunset.reactive.websocketserver.websocketconfig.handshake;
+package sunset.reactive.common.websocketconfig.handshake;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;

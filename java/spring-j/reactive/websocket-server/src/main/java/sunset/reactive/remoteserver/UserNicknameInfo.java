@@ -1,4 +1,4 @@
-package sunset.reactive.externalrestserver;
+package sunset.reactive.remoteserver;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
