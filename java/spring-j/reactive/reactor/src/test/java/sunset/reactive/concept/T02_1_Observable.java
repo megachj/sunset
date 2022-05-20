@@ -1,4 +1,4 @@
-package sunset.spring.concept;
+package sunset.reactive.concept;
 
 import java.util.Observable;
 import java.util.Observer;

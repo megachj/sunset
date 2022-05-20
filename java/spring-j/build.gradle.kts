@@ -22,12 +22,12 @@ allprojects {
         set("springAutoRestDocsVersion", "2.0.7")
         set("springDocOpenApiUiVersion", "1.5.2") // Swagger
 
+        set("projectReactorVersion", "3.4.18")
+
         set("hibernateValidatorVersion", "7.0.0.Final")
         set("resilience4jVersion", "1.6.1")
 
         set("nettyAllVersion", "4.1.77.Final")
-
-        set("nettyVersion", "4.1.74.Final")
     }
 }
 

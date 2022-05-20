@@ -1,7 +1,7 @@
 rootProject.name = "spring-j"
 
 include(":reactive")
-include(":reactive:concept")
+include(":reactive:reactor")
 include(":reactive:webflux")
 include(":reactive:webmvc")
 include(":reactive:websocket-server")

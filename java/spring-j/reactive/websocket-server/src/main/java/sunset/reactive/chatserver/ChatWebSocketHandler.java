@@ -33,6 +33,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
             .get(HandshakeWebSocketMainService.CONNECTION_LIVE_SECONDS_ATTRIBUTE_NAME);
 
         Mono<Void> chatMsgInput = session.receive()
+            .log("session receive")
             .take(Duration.ofSeconds(connectionLiveSeconds), wsConnTimer)
             .filter(webSocketMessage -> webSocketMessage.getType() == Type.TEXT)
             .map(webSocketMessage -> ChatMessage.parsePayload(authUser.getId(),
@@ -43,6 +44,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
             .then();
 
         Flux<WebSocketMessage> chatMsgOutputSource = simpleChatMessagePubSubService.listen(authUser.getId())
+            .log("chat sub")
             .map(chatMessage -> String.format("from %s: %s",
                 chatMessage.getFromUserId(),
                 chatMessage.getContent())
@@ -53,6 +55,11 @@ public class ChatWebSocketHandler implements WebSocketHandler {
             Flux.merge(chatMsgOutputSource)
         );
 
+        /*
+        return 한 스트림만 구독된다.
+         - chatMsgInput 을 리턴하지 않으면 구독되지 않는다. 즉 웹소켓 인풋 메시지가 들어오지 않는다.
+         - output 을 리턴하지 않으면 구독되지 않는다. 즉 웹소켓을 통해 메시지가 나가지 않는다.
+         */
         return Mono.zip(chatMsgInput, output).then();
     }
 }

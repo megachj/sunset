@@ -1,12 +1,12 @@
-package sunset.spring;
+package sunset.reactive;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ConceptApplication {
+public class ReactorApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ConceptApplication.class, args);
+        SpringApplication.run(ReactorApplication.class, args);
     }
 }
