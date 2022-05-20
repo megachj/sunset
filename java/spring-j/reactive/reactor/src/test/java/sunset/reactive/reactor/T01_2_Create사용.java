@@ -16,35 +16,20 @@ public class T01_2_Create사용 {
     @Test
     public void create사용_및_hot스트림사용_해서_PubSub구현() {
 
-        DataPump pump = new DataPump();
-
-        ConnectableFlux<String> hotSource = Flux.create((FluxSink<String> sink) -> {
-                pump.setListener(
-                    new DataListener<>() {
-                        @Override
-                        public void onData(List<String> chunk) {
-                            chunk.forEach(s -> {
-                                sink.next(s); // Subscriber의 요청에 상관없이 신호 발생
-                            });
-                        }
-
-                        @Override
-                        public void complete() {
-                            log.info("complete");
-                            sink.complete();
-                        }
-                    }
-                );
-            }, OverflowStrategy.IGNORE)
+        Channel<String> channel = new Channel<>();
+        ConnectableFlux<String> dataPublisher = Flux.create((FluxSink<String> sink) ->
+                channel.setListener(sink::next), OverflowStrategy.IGNORE
+            )
             .log("after create")
             .publish();
 
-        hotSource.connect();
+        dataPublisher.connect(); // cold source -> hot source
 
-        pump.emit(List.of("이말년", "주호민"));
+        channel.publish("이말년");
+        channel.publish("주호민");
 
         // subscriber1: 침착맨, 쭈펄, 쭈거니, 병거니
-        Disposable subscriber1 = hotSource
+        Disposable subscriber1 = dataPublisher
             .doOnSubscribe(subscription -> {
                 log.info("subscriber1: onSubscribe");
             })
@@ -56,10 +41,11 @@ public class T01_2_Create사용 {
             })
             .subscribe();
 
-        pump.emit(List.of("침착맨", "쭈펄"));
+        channel.publish("침착맨");
+        channel.publish("쭈펄");
 
         // subscriber2: 쭈거니, 병거니, 쏘영
-        Disposable subscriber2 = hotSource
+        Disposable subscriber2 = dataPublisher
             .doOnSubscribe(subscription -> {
                 log.info("subscriber2: onSubscribe");
             })
@@ -71,32 +57,33 @@ public class T01_2_Create사용 {
             })
             .subscribe();
 
-        pump.emit(List.of("쭈거니", "병거니"));
+        channel.publish("쭈거니");
+        channel.publish("병거니");
 
         subscriber1.dispose();
 
-        pump.emit(List.of("쏘영"));
+        channel.publish("쏘영");
     }
 
-    public static class DataPump {
+    public static class Channel<T> {
 
-        private List<DataListener<String>> listeners = new ArrayList<>();
+        private List<ChannelListener<T>> listeners = new ArrayList<>();
 
-        public void setListener(DataListener<String> listener) {
+        public void setListener(ChannelListener<T> listener) {
             listeners.add(listener);
         }
 
-        public void emit(List<String> inputData) {
+        public void publish(T data) {
             listeners.forEach(l -> {
-                l.onData(inputData);
+                l.onData(data);
             });
         }
     }
 
-    public interface DataListener<T> {
+    public interface ChannelListener<T> {
 
-        void onData(List<T> chunk);
+        void onData(T chunk);
 
-        void complete();
+        // void complete();
     }
 }
