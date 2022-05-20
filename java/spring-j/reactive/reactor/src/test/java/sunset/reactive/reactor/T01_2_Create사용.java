@@ -1,7 +1,5 @@
 package sunset.reactive.reactor;
 
-import java.util.ArrayList;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import reactor.core.Disposable;
@@ -9,6 +7,7 @@ import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.FluxSink.OverflowStrategy;
+import sunset.reactive.common.Channel;
 
 @Slf4j
 public class T01_2_Create사용 {
@@ -63,27 +62,5 @@ public class T01_2_Create사용 {
         subscriber1.dispose();
 
         channel.publish("쏘영");
-    }
-
-    public static class Channel<T> {
-
-        private List<ChannelListener<T>> listeners = new ArrayList<>();
-
-        public void setListener(ChannelListener<T> listener) {
-            listeners.add(listener);
-        }
-
-        public void publish(T data) {
-            listeners.forEach(l -> {
-                l.onData(data);
-            });
-        }
-    }
-
-    public interface ChannelListener<T> {
-
-        void onData(T chunk);
-
-        // void complete();
     }
 }
