@@ -4,5 +4,5 @@ public interface ChannelListener<T> {
 
     void onData(T t);
 
-    void complete();
+    // void complete();
 }

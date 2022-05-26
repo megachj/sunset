@@ -25,22 +25,8 @@ public class UserNicknamePubSubService implements PubSubService<UserNicknameInfo
     public void init() {
         channel = Channel.connectNewChannel();
 
-        hotSourcePublisher = Flux.create((FluxSink<UserNicknameInfo> sink) -> {
-                channel.setListener(
-                    new ChannelListener<>() {
-                        @Override
-                        public void onData(UserNicknameInfo userNicknameInfo) {
-                            sink.next(userNicknameInfo); // Subscriber의 요청에 상관없이 신호 발생
-                        }
-
-                        @Override
-                        public void complete() {
-                            log.info("complete");
-                            sink.complete();
-                        }
-                    }
-                );
-            }, OverflowStrategy.IGNORE)
+        hotSourcePublisher = Flux.create((FluxSink<UserNicknameInfo> sink) ->
+                channel.setListener(sink::next), OverflowStrategy.IGNORE)
             .publish();
         hotSourcePublisher.connect();
     }
