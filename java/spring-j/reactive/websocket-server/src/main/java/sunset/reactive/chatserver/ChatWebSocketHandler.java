@@ -33,11 +33,10 @@ public class ChatWebSocketHandler implements WebSocketHandler {
             .get(HandshakeWebSocketMainService.CONNECTION_LIVE_SECONDS_ATTRIBUTE_NAME);
 
         Mono<Void> chatMsgInput = session.receive()
-            .log("session receive")
             .take(Duration.ofSeconds(connectionLiveSeconds), wsConnectionTimer)
-            .filter(webSocketMessage -> webSocketMessage.getType() == Type.TEXT)
-            .map(webSocketMessage -> ChatMessage.parsePayload(authUser.getId(),
-                webSocketMessage.getPayloadAsText()))
+            .filter(wsMessage -> wsMessage.getType() == Type.TEXT)
+            .map(wsMessage -> ChatMessage.parsePayload(authUser.getId(),
+                wsMessage.getPayloadAsText()))
             .doOnNext(chatMessage -> {
                 simpleChatMessagePubSubService.sendMessage(chatMessage);
             })

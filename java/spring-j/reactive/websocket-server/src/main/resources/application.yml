@@ -1,0 +1,9 @@
+server:
+  port: ${running.port:8080}
+
+logging:
+  file:
+    path: ${application.log.dir:./logs}
+  level:
+    root: info
+    sunset.react.*: debug
