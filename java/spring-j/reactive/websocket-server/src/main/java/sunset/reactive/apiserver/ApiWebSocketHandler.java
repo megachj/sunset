@@ -22,7 +22,7 @@ public class ApiWebSocketHandler implements WebSocketHandler {
 
     private final UserNicknameSearchService userNicknameSearchService;
 
-    private final Scheduler wsConnTimer;
+    private final Scheduler wsConnectionTimer;
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
@@ -33,7 +33,7 @@ public class ApiWebSocketHandler implements WebSocketHandler {
 
         // TODO
         Flux<WebSocketMessage> requestSource = session.receive()
-            .take(Duration.ofSeconds(connectionLiveSeconds), wsConnTimer)
+            .take(Duration.ofSeconds(connectionLiveSeconds), wsConnectionTimer)
             .filter(message -> message.getType() == Type.TEXT);
 
         return null;

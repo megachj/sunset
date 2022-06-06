@@ -23,7 +23,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
 
     private final PubSubService<ChatMessage> simpleChatMessagePubSubService;
 
-    private final Scheduler wsConnTimer;
+    private final Scheduler wsConnectionTimer;
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
@@ -34,7 +34,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
 
         Mono<Void> chatMsgInput = session.receive()
             .log("session receive")
-            .take(Duration.ofSeconds(connectionLiveSeconds), wsConnTimer)
+            .take(Duration.ofSeconds(connectionLiveSeconds), wsConnectionTimer)
             .filter(webSocketMessage -> webSocketMessage.getType() == Type.TEXT)
             .map(webSocketMessage -> ChatMessage.parsePayload(authUser.getId(),
                 webSocketMessage.getPayloadAsText()))
