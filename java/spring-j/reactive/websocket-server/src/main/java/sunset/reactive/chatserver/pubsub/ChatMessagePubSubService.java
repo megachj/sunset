@@ -10,14 +10,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.FluxSink.OverflowStrategy;
 import sunset.reactive.common.channel.Channel;
-import sunset.reactive.common.channel.ChannelListener;
 import sunset.reactive.chatserver.model.ChatMessage;
 import sunset.reactive.common.pubsub.PubSubService;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class SimpleChatMessagePubSubService implements PubSubService<ChatMessage> {
+public class ChatMessagePubSubService implements PubSubService<ChatMessage> {
 
     private Channel<ChatMessage> channel;
     private ConnectableFlux<ChatMessage> hotSourcePublisher;
@@ -26,22 +25,9 @@ public class SimpleChatMessagePubSubService implements PubSubService<ChatMessage
     public void init() {
         channel = Channel.connectNewChannel();
 
-        hotSourcePublisher = Flux.create((FluxSink<ChatMessage> sink) -> {
-                channel.setListener(
-                    new ChannelListener<>() {
-                        @Override
-                        public void onData(ChatMessage chatMessage) {
-                            sink.next(chatMessage);
-                        }
-
-                        @Override
-                        public void complete() {
-                            log.info("complete");
-                            sink.complete();
-                        }
-                    }
-                );
-            }, OverflowStrategy.IGNORE)
+        hotSourcePublisher = Flux.create((FluxSink<ChatMessage> sink) ->
+                channel.setListener(chatMessage -> sink.next(chatMessage)),
+                OverflowStrategy.IGNORE)
             .publish();
         hotSourcePublisher.connect();
     }
@@ -54,10 +40,6 @@ public class SimpleChatMessagePubSubService implements PubSubService<ChatMessage
     @Override
     public Flux<ChatMessage> listen(String userId) {
         return hotSourcePublisher
-            .filter(chatMessage ->
-                "all".equals(chatMessage.getToUserId().toLowerCase(Locale.ROOT)) ||
-                    userId.equals(chatMessage.getToUserId()) ||
-                    userId.equals(chatMessage.getFromUserId())
-            );
+            .filter(chatMessage -> userId.equals(chatMessage.getToUserId()));
     }
 }

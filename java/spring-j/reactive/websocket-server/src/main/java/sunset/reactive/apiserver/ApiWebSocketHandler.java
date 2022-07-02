@@ -10,7 +10,6 @@ import org.springframework.web.reactive.socket.WebSocketMessage.Type;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
 import sunset.reactive.apiserver.service.UserNicknameSearchService;
 import sunset.reactive.common.websocketconfig.handshake.AuthUser;
 import sunset.reactive.common.websocketconfig.handshake.HandshakeWebSocketMainService;
@@ -22,8 +21,6 @@ public class ApiWebSocketHandler implements WebSocketHandler {
 
     private final UserNicknameSearchService userNicknameSearchService;
 
-    private final Scheduler wsConnectionTimer;
-
     @Override
     public Mono<Void> handle(WebSocketSession session) {
         AuthUser authUser = (AuthUser) session.getAttributes()
@@ -33,7 +30,7 @@ public class ApiWebSocketHandler implements WebSocketHandler {
 
         // TODO
         Flux<WebSocketMessage> requestSource = session.receive()
-            .take(Duration.ofSeconds(connectionLiveSeconds), wsConnectionTimer)
+            .take(Duration.ofSeconds(connectionLiveSeconds))
             .filter(message -> message.getType() == Type.TEXT);
 
         return null;
