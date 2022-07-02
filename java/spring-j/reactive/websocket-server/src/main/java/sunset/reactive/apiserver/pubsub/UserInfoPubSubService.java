@@ -9,35 +9,34 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.FluxSink.OverflowStrategy;
 import sunset.reactive.common.pubsub.PubSubService;
-import sunset.reactive.remoteserver.UserNicknameInfo;
+import sunset.reactive.remoteserver.UserInfo;
 import sunset.reactive.common.channel.Channel;
-import sunset.reactive.common.channel.ChannelListener;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class UserNicknamePubSubService implements PubSubService<UserNicknameInfo> {
+public class UserInfoPubSubService implements PubSubService<UserInfo> {
 
-    private Channel<UserNicknameInfo> channel;
-    private ConnectableFlux<UserNicknameInfo> hotSourcePublisher;
+    private Channel<UserInfo> channel;
+    private ConnectableFlux<UserInfo> hotSourcePublisher;
 
     @PostConstruct
     public void init() {
         channel = Channel.connectNewChannel();
 
-        hotSourcePublisher = Flux.create((FluxSink<UserNicknameInfo> sink) ->
+        hotSourcePublisher = Flux.create((FluxSink<UserInfo> sink) ->
                 channel.setListener(sink::next), OverflowStrategy.IGNORE)
             .publish();
         hotSourcePublisher.connect();
     }
 
     @Override
-    public void sendMessage(UserNicknameInfo data) {
+    public void sendMessage(UserInfo data) {
         channel.publish(data);
     }
 
     @Override
-    public Flux<UserNicknameInfo> listen(String userId) {
+    public Flux<UserInfo> listen(String userId) {
         return hotSourcePublisher
             .filter(userNicknameInfo -> userId.equals(userNicknameInfo.getUserId()));
     }

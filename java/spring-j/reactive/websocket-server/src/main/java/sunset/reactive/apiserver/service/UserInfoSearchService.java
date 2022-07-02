@@ -4,35 +4,35 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import sunset.reactive.remoteserver.UserNicknameInfo;
+import sunset.reactive.remoteserver.UserInfo;
 
 @Slf4j
 @Service
-public class UserNicknameSearchService {
+public class UserInfoSearchService {
 
     private final WebClient webClient;
 
-    public UserNicknameSearchService(
+    public UserInfoSearchService(
         WebClient.Builder webClientBuilder
     ) {
         this.webClient = webClientBuilder.baseUrl("http://localhost:8080").build();
     }
 
-    public Mono<UserNicknameInfo> getUserNickname(String userId) {
+    public Mono<UserInfo> getUserInfo(String userId) {
         return this.webClient
             .get()
-            .uri(uriBuilder -> uriBuilder.path("/api/users/{userId}/nickname")
+            .uri(uriBuilder -> uriBuilder.path("/api/users/{userId}")
                 .pathSegment()
                 .build(userId)
             )
             .retrieve()
-            .bodyToMono(UserNicknameInfo.class);
+            .bodyToMono(UserInfo.class);
     }
 
-    public Mono<Void> pubLatestUserNickname(String userId) {
+    public Mono<Void> collectLatestUserInfo(String userId) {
         return this.webClient
             .post()
-            .uri(uriBuilder -> uriBuilder.path("/api/users/{userId}/latest-nickname/pub")
+            .uri(uriBuilder -> uriBuilder.path("/api/users/{userId}/collect-latest")
                 .pathSegment()
                 .build(userId)
             )

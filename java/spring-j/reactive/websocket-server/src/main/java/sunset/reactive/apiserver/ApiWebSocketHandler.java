@@ -10,7 +10,7 @@ import org.springframework.web.reactive.socket.WebSocketMessage.Type;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import sunset.reactive.apiserver.service.UserNicknameSearchService;
+import sunset.reactive.apiserver.service.UserInfoSearchService;
 import sunset.reactive.common.websocketconfig.handshake.AuthUser;
 import sunset.reactive.common.websocketconfig.handshake.HandshakeWebSocketMainService;
 
@@ -19,7 +19,7 @@ import sunset.reactive.common.websocketconfig.handshake.HandshakeWebSocketMainSe
 @Component
 public class ApiWebSocketHandler implements WebSocketHandler {
 
-    private final UserNicknameSearchService userNicknameSearchService;
+    private final UserInfoSearchService userInfoSearchService;
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
