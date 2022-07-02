@@ -1,4 +1,4 @@
-package sunset.reactive.apiserver.service;
+package sunset.reactive.apiserver.client;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -8,11 +8,11 @@ import sunset.reactive.remoteserver.UserInfo;
 
 @Slf4j
 @Service
-public class UserInfoSearchService {
+public class UserInfoRemoteClient {
 
     private final WebClient webClient;
 
-    public UserInfoSearchService(
+    public UserInfoRemoteClient(
         WebClient.Builder webClientBuilder
     ) {
         this.webClient = webClientBuilder.baseUrl("http://localhost:8080").build();
