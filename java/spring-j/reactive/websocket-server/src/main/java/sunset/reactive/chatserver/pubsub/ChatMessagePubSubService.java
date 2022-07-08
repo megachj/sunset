@@ -36,7 +36,6 @@ public class ChatMessagePubSubService implements PubSubService<ChatMessage> {
     @Override
     public void publish(ChatMessage chatMessage) {
         Flux.just(chatMessage)
-            // .delayElements(Duration.ofSeconds(1L))
             .doOnNext(next -> observable.notifyObservers(next))
             .subscribe();
     }
