@@ -34,10 +34,10 @@ public class ChatWebSocketHandler implements WebSocketHandler {
             .map(WebSocketMessage::getPayloadAsText)
             .log(PREFIX + "chat.Receive", Level.FINE, SIGNALS)
             .map(wsMessage -> ChatMessage.serializeFromReceivedMessage(authUser.getId(), wsMessage))
-            .doOnNext(chatMessagePubSubService::sendMessage)
+            .doOnNext(chatMessagePubSubService::publish)
             .then();
 
-        Flux<WebSocketMessage> chatMsgOutputSource = chatMessagePubSubService.listen(authUser.getId())
+        Flux<WebSocketMessage> chatMsgOutputSource = chatMessagePubSubService.subscribe(authUser.getId())
             .log(PREFIX + "chat.Send", Level.FINE, SIGNALS)
             .map(ChatMessage::deserializeToSentMessage)
             .map(session::textMessage);

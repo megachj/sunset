@@ -8,35 +8,41 @@ import reactor.core.publisher.ConnectableFlux;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.FluxSink.OverflowStrategy;
+import sunset.reactive.common.pattern.observer.Observable;
+import sunset.reactive.common.pattern.observer.SingleObservable;
 import sunset.reactive.common.pubsub.PubSubService;
 import sunset.reactive.remoteserver.UserInfo;
-import sunset.reactive.common.channel.Channel;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserInfoPubSubService implements PubSubService<UserInfo> {
 
-    private Channel<UserInfo> channel;
+    private Observable<UserInfo> observable;
     private ConnectableFlux<UserInfo> hotSourcePublisher;
 
     @PostConstruct
     public void init() {
-        channel = Channel.connectNewChannel();
+        observable = SingleObservable.newObservable();
 
-        hotSourcePublisher = Flux.create((FluxSink<UserInfo> sink) ->
-                channel.setListener(sink::next), OverflowStrategy.IGNORE)
+        hotSourcePublisher = Flux.create(
+                (FluxSink<UserInfo> sink) -> observable.add(sink::next),
+                OverflowStrategy.IGNORE
+            )
             .publish();
         hotSourcePublisher.connect();
     }
 
     @Override
-    public void sendMessage(UserInfo data) {
-        channel.publish(data);
+    public void publish(UserInfo data) {
+        Flux.just(data)
+            // .delayElements(Duration.ofSeconds(1L))
+            .doOnNext(next -> observable.notifyObservers(next))
+            .subscribe();
     }
 
     @Override
-    public Flux<UserInfo> listen(String userId) {
+    public Flux<UserInfo> subscribe(String userId) {
         return hotSourcePublisher
             .filter(userNicknameInfo -> userId.equals(userNicknameInfo.getUserId()));
     }

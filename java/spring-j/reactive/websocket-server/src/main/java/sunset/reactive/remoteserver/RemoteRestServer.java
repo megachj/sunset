@@ -38,7 +38,7 @@ public class RemoteRestServer {
         Mono
             .delay(Duration.ofSeconds(3), asyncJobScheduler)
             .doOnNext(next -> {
-                userInfoPubSubService.sendMessage(
+                userInfoPubSubService.publish(
                     UserInfo.builder()
                         .userId(userId)
                         .score(100L)
