@@ -11,9 +11,10 @@ import lombok.ToString;
 @Getter
 @ToString
 @Builder
-public class UserInfo {
+public class UserScoreInfo {
 
     private String userId;
+    private String category;
     private Long score;
     private LocalDateTime scoreUpdatedAt;
 }

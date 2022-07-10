@@ -1,5 +1,6 @@
 package sunset.reactive.apiserver.pubsub;
 
+import java.time.Duration;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,22 +12,22 @@ import reactor.core.publisher.FluxSink.OverflowStrategy;
 import sunset.reactive.common.pattern.observer.Observable;
 import sunset.reactive.common.pattern.observer.SingleObservable;
 import sunset.reactive.common.pubsub.PubSubService;
-import sunset.reactive.remoteserver.UserInfo;
+import sunset.reactive.remoteserver.UserScoreInfo;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class UserInfoPubSubService implements PubSubService<UserInfo> {
+public class UserScorePubSubService implements PubSubService<UserScoreInfo> {
 
-    private Observable<UserInfo> observable;
-    private ConnectableFlux<UserInfo> hotSourcePublisher;
+    private Observable<UserScoreInfo> observable;
+    private ConnectableFlux<UserScoreInfo> hotSourcePublisher;
 
     @PostConstruct
     public void init() {
         observable = SingleObservable.newObservable();
 
         hotSourcePublisher = Flux.create(
-                (FluxSink<UserInfo> sink) -> observable.add(sink::next),
+                (FluxSink<UserScoreInfo> sink) -> observable.add(sink::next),
                 OverflowStrategy.IGNORE
             )
             .publish();
@@ -34,15 +35,15 @@ public class UserInfoPubSubService implements PubSubService<UserInfo> {
     }
 
     @Override
-    public void publish(UserInfo data) {
+    public void publish(UserScoreInfo data) {
         Flux.just(data)
-            // .delayElements(Duration.ofSeconds(1L))
+            .delayElements(Duration.ofSeconds(1L))
             .doOnNext(next -> observable.notifyObservers(next))
             .subscribe();
     }
 
     @Override
-    public Flux<UserInfo> subscribe(String userId) {
+    public Flux<UserScoreInfo> subscribe(String userId) {
         return hotSourcePublisher
             .filter(userNicknameInfo -> userId.equals(userNicknameInfo.getUserId()));
     }

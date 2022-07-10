@@ -13,7 +13,7 @@ import org.springframework.web.reactive.socket.WebSocketMessage.Type;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import sunset.reactive.apiserver.client.UserInfoRemoteClient;
+import sunset.reactive.apiserver.client.UserScoreRemoteClient;
 import sunset.reactive.common.websocketconfig.handshake.AuthUser;
 import sunset.reactive.common.websocketconfig.handshake.HandshakeWebSocketMainService;
 
@@ -22,7 +22,7 @@ import sunset.reactive.common.websocketconfig.handshake.HandshakeWebSocketMainSe
 @Component
 public class ApiWebSocketHandler implements WebSocketHandler {
 
-    private final UserInfoRemoteClient userInfoRemoteClient;
+    private final UserScoreRemoteClient userScoreRemoteClient;
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
