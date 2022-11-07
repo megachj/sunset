@@ -23,6 +23,7 @@ allprojects {
         set("springDocOpenApiUiVersion", "1.5.2") // Swagger
 
         set("projectReactorVersion", "3.4.18")
+        set("blockHoundVersion", "1.0.6.RELEASE")
 
         set("hibernateValidatorVersion", "7.0.0.Final")
         set("resilience4jVersion", "1.6.1")

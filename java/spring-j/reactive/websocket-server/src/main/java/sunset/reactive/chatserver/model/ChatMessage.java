@@ -12,8 +12,12 @@ public class ChatMessage {
 
     private String content;
 
-    public static ChatMessage parsePayload(String fromUserId, String payload) {
-        String[] parsed = payload.split("\n");
+    public String deserializeToSentMessage() {
+        return String.format("from: %s\n%s", fromUserId, content);
+    }
+
+    public static ChatMessage serializeFromReceivedMessage(String fromUserId, String receivedMessage) {
+        String[] parsed = receivedMessage.split("\n", 2);
 
         return ChatMessage.builder()
             .fromUserId(fromUserId)

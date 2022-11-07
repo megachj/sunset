@@ -9,5 +9,4 @@ import lombok.Data;
 public class AuthUser {
 
     private String id;
-    private String name;
 }

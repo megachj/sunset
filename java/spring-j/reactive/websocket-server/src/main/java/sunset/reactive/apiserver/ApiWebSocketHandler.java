@@ -1,6 +1,9 @@
 package sunset.reactive.apiserver;
 
+import static sunset.reactive.common.utils.ReactorLoggingUtils.PREFIX;
+import static sunset.reactive.common.utils.ReactorLoggingUtils.SIGNALS;
 import java.time.Duration;
+import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -10,8 +13,7 @@ import org.springframework.web.reactive.socket.WebSocketMessage.Type;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
-import sunset.reactive.apiserver.service.UserNicknameSearchService;
+import sunset.reactive.apiserver.client.UserInfoRemoteClient;
 import sunset.reactive.common.websocketconfig.handshake.AuthUser;
 import sunset.reactive.common.websocketconfig.handshake.HandshakeWebSocketMainService;
 
@@ -20,9 +22,7 @@ import sunset.reactive.common.websocketconfig.handshake.HandshakeWebSocketMainSe
 @Component
 public class ApiWebSocketHandler implements WebSocketHandler {
 
-    private final UserNicknameSearchService userNicknameSearchService;
-
-    private final Scheduler wsConnTimer;
+    private final UserInfoRemoteClient userInfoRemoteClient;
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
@@ -31,10 +31,11 @@ public class ApiWebSocketHandler implements WebSocketHandler {
         long connectionLiveSeconds = (Long) session.getAttributes()
             .get(HandshakeWebSocketMainService.CONNECTION_LIVE_SECONDS_ATTRIBUTE_NAME);
 
-        // TODO
-        Flux<WebSocketMessage> requestSource = session.receive()
-            .take(Duration.ofSeconds(connectionLiveSeconds), wsConnTimer)
-            .filter(message -> message.getType() == Type.TEXT);
+        Flux<String> requestTextSource = session.receive()
+            .take(Duration.ofSeconds(connectionLiveSeconds))
+            .filter(message -> message.getType() == Type.TEXT)
+            .map(WebSocketMessage::getPayloadAsText)
+            .log(PREFIX + "api.Receive", Level.FINE, SIGNALS);
 
         return null;
     }

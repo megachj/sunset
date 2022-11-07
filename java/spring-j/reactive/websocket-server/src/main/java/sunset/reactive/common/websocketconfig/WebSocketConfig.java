@@ -18,7 +18,7 @@ import sunset.reactive.chatserver.ChatWebSocketHandler;
 
 @Configuration
 @EnableWebFlux
-public class WebSocketConfiguration {
+public class WebSocketConfig {
 
     @Bean
     public HandlerMapping handlerMapping(ChatWebSocketHandler chatWebSocketHandler,
@@ -43,11 +43,5 @@ public class WebSocketConfiguration {
     @Bean
     public RequestUpgradeStrategy requestUpgradeStrategy() {
         return new ReactorNettyRequestUpgradeStrategy();
-    }
-
-    @Bean
-    public Scheduler wsConnTimer() {
-        // TODO: 스케줄러 최적화
-        return Schedulers.newParallel("wsConnTimer");
     }
 }
