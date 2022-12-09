@@ -7,5 +7,3 @@ include(":reactive:webmvc")
 include(":reactive:websocket-server")
 
 include(":resilience4j")
-
-include(":ws-chat")
