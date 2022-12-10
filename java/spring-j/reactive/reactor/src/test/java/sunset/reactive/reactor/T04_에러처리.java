@@ -72,12 +72,8 @@ public class T04_에러처리 {
 
         StepVerifier.create(publisher)
             .expectNext(1)
-            .expectNext(2)
-            .expectNext(3)
             .expectNext(1)
             .expectNext(2)
-            .expectNext(3)
-            .expectNext(4)
             .verifyTimeout(Duration.ofSeconds(1));
     }
 
