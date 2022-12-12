@@ -1,4 +1,4 @@
-package sunset.reactive.reactor;
+package sunset.reactive.reactoroperator;
 
 import java.util.logging.Level;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,7 @@ import reactor.core.scheduler.Schedulers;
 import sunset.reactive.common.Channel;
 
 @Slf4j
-public class Merge_Test {
+public class FluxMerge_테스트 {
 
     @DisplayName("async_infinite Flux 2개를 merge")
     @Test
