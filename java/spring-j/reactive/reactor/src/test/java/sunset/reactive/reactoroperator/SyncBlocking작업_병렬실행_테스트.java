@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.ParallelFlux;
 import reactor.core.publisher.SignalType;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
@@ -40,7 +39,7 @@ public class SyncBlocking작업_병렬실행_테스트 {
     // SyncBlocking 작업을 처리하는 스케줄러
     private static final Scheduler DB_SCHEDULER = Schedulers.newParallel("db", 5);
 
-    @DisplayName("논블로킹 작업을 하고, 동기블로킹 작업 전에 parallel().runOn() 을 적용하면 병렬로 동작한다.")
+    @DisplayName("논블로킹 작업을 하고, 동기블로킹 작업 전에 parallel().runOn() 을 적용하고 flatMap으로 연결하면 병렬로 동작한다.")
     @Timeout(6 + TIME_ALPHA) // 가장 오래걸리는 숫자가 3으로 수행되기까지 6초(api 응답 4초 + db 쿼리 2초) 소요
     @Test
     public void 병렬_실행__when__동기블로킹_작업_전에_parallel을_적용() {
@@ -59,6 +58,36 @@ public class SyncBlocking작업_병렬실행_테스트 {
             .runOn(DB_SCHEDULER)
             .log("beforeDb", Level.FINE, signalTypes) // db 스케줄러
             .flatMap(num -> requestDbWithSyncBlocking(num, 2_000L))
+            .log("afterDb", Level.FINE, signalTypes) // db 스케줄러
+            .sequential()
+            .log("afterSequential", Level.FINE, signalTypes) // db 스케줄러
+            ;
+
+        // then
+        StepVerifier.create(result)
+            .expectNext(4, 2, 5, 1, 3)
+            .verifyComplete();
+    }
+
+    @DisplayName("논블로킹 작업을 하고, 동기블로킹 작업 전에 parallel().runOn() 을 적용하고 map으로 연결하면 병렬로 동작한다.")
+    @Timeout(6 + TIME_ALPHA) // 가장 오래걸리는 숫자가 3으로 수행되기까지 6초(api 응답 4초 + db 쿼리 2초) 소요
+    @Test
+    public void 병렬_실행__when__동기블로킹_작업_전에_parallel을_적용1() {
+        // chore
+        // SignalType[] signalTypes = ReactorLogUtils.ALL_SIGNAL_TYPES;
+        SignalType[] signalTypes = {SignalType.ON_NEXT};
+
+        // given
+        List<Integer> numbers = List.of(1, 2, 3, 4, 5);
+
+        // when
+        Flux<Integer> result = Flux.fromIterable(numbers)
+            .flatMap(this::requestApiWithAsyncNonBlocking)
+            .log("afterApi", Level.FINE, signalTypes) // api 스케줄러
+            .parallel(numbers.size())
+            .runOn(DB_SCHEDULER)
+            .log("beforeDb", Level.FINE, signalTypes) // db 스케줄러
+            .map(num -> requestDbWithSyncBlocking(num, 2_000L).block())
             .log("afterDb", Level.FINE, signalTypes) // db 스케줄러
             .sequential()
             .log("afterSequential", Level.FINE, signalTypes) // db 스케줄러
