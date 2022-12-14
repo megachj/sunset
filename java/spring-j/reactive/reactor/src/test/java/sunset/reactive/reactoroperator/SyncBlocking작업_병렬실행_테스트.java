@@ -52,7 +52,7 @@ public class SyncBlocking작업_병렬실행_테스트 {
         List<Integer> numbers = List.of(1, 2, 3, 4, 5);
 
         // when
-        ParallelFlux<Integer> result = Flux.fromIterable(numbers)
+        Flux<Integer> result = Flux.fromIterable(numbers)
             .flatMap(this::requestApiWithAsyncNonBlocking)
             .log("afterApi", Level.FINE, signalTypes) // api 스케줄러
             .parallel(numbers.size())
@@ -60,6 +60,8 @@ public class SyncBlocking작업_병렬실행_테스트 {
             .log("beforeDb", Level.FINE, signalTypes) // db 스케줄러
             .flatMap(num -> requestDbWithSyncBlocking(num, 2_000L))
             .log("afterDb", Level.FINE, signalTypes) // db 스케줄러
+            .sequential()
+            .log("afterSequential", Level.FINE, signalTypes) // db 스케줄러
             ;
 
         // then
