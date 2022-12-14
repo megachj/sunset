@@ -58,7 +58,7 @@ public class ThreadPool_테스트 {
         log.info("main: end");
     }
 
-    @DisplayName("ScheduledThreadPool + scedule + NonBlockingTask 테스트")
+    @DisplayName("ScheduledThreadPool + schedule + NonBlockingTask 테스트")
     @Test
     public void test4() throws Exception {
         log.info("main: start");
@@ -70,6 +70,22 @@ public class ThreadPool_테스트 {
             log.info("main >>> schedule after {}ms...", delayMs);
             scheduledExecutorService.schedule(iTask, delayMs, TimeUnit.MILLISECONDS);
         }
+
+        Thread.sleep(10_000L);
+        log.info("main: end");
+    }
+
+    @DisplayName("ScheduledThreadPool + schedule + NonBlockingTask 테스트")
+    @Test
+    public void test5() throws Exception {
+        log.info("main: start");
+        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
+
+        NonBlockingTask task1 = new NonBlockingTask(1, 1_000L);
+        scheduledExecutorService.schedule(task1, 2_000L, TimeUnit.MILLISECONDS);
+
+        NonBlockingTask task2 = new NonBlockingTask(2, 1_000L);
+        scheduledExecutorService.schedule(task2, 0L, TimeUnit.MILLISECONDS);
 
         Thread.sleep(10_000L);
         log.info("main: end");
