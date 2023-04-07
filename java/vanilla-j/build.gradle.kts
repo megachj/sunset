@@ -12,8 +12,6 @@ allprojects {
     group = "sunset"
 
     ext {
-        set("hibernateValidatorVersion", "7.0.0.Final")
-        set("resilience4jVersion", "1.6.1")
     }
 }
 
