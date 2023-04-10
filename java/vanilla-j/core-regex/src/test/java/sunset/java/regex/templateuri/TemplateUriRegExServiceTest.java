@@ -31,7 +31,7 @@ public class TemplateUriRegExServiceTest {
         "/aa/bb",
         "/aa/**/bb/**",
     })
-    public void isTemplateUri_파라미터_실_테스트(String templateUri) {
+    public void isTemplateUri_파라미터_실패_테스트(String templateUri) {
         // when
         boolean actual = TemplateUriRegExService.isTemplateUri(templateUri);
 
